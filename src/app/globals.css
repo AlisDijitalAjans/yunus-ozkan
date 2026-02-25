@@ -2,8 +2,72 @@
 
 @theme inline {
   --color-primary-gold: #d5b36b;
+  --color-primary-gold-dark: #c9a961;
+  --color-primary-gold-light: #f4e4c1;
   --color-dark-bg: #0a0a0a;
   --color-light-bg: #1a1a1a;
+}
+
+/* ===== Theme Color Utilities ===== */
+/* @theme inline var() desteklemiyor, @utility ile tanımlıyoruz */
+@utility text-theme-text {
+  color: var(--theme-text);
+}
+@utility text-theme-text-secondary {
+  color: var(--theme-text-secondary);
+}
+@utility text-theme-text-muted {
+  color: var(--theme-text-muted);
+}
+@utility text-theme-text-faint {
+  color: var(--theme-text-faint);
+}
+@utility bg-theme-bg {
+  background-color: var(--theme-bg);
+}
+@utility bg-theme-glass-bg {
+  background-color: var(--theme-glass-bg);
+}
+@utility border-theme-border {
+  border-color: var(--theme-border);
+}
+@utility border-theme-glass-border {
+  border-color: var(--theme-glass-border);
+}
+@utility bg-theme-drawer-bg {
+  background-color: var(--theme-drawer-bg);
+}
+@utility bg-theme-drawer-hover {
+  background-color: var(--theme-drawer-hover);
+}
+@utility text-theme-nav-text {
+  color: var(--theme-nav-text);
+}
+@utility text-theme-nav-hover {
+  color: var(--theme-nav-hover);
+}
+
+/* ===== Fluid Typography Utilities ===== */
+@utility text-fluid-hero {
+  font-size: clamp(1.875rem, 5vw, 4.5rem);
+}
+@utility text-fluid-section {
+  font-size: clamp(1.875rem, 4vw, 3rem);
+}
+@utility text-fluid-subsection {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+@utility text-fluid-stat {
+  font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+}
+@utility text-fluid-stat-lg {
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+}
+@utility text-fluid-body {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+}
+@utility text-fluid-card-title {
+  font-size: clamp(0.875rem, 1.5vw, 1.125rem);
 }
 
 /* ===== Theme Variables ===== */
@@ -46,11 +110,8 @@
 }
 
 /* Global Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* * reset kaldirildi - Tailwind v4 preflight (@layer base) zaten ayni reseti yapiyor.
+   Unlayered * reset, @layer utilities'i eziyordu (padding, margin, gap calismiyor). */
 
 html {
   scroll-behavior: smooth;

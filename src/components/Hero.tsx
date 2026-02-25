@@ -20,83 +20,50 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      style={{
-        position: "relative",
-        display: "flex",
-        alignItems: "center",
-        overflow: "hidden",
-        minHeight: "100vh",
-        paddingTop: "10rem",
-        paddingBottom: "6rem",
-      }}
+      className="relative flex items-center overflow-hidden min-h-screen pt-40 pb-24"
     >
-      <div className="container-custom relative" style={{ zIndex: 10 }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "2.5rem",
-            alignItems: "center",
-          }}
-          className="hero-grid"
-        >
+      <div className="container-custom relative z-10">
+        <div className="grid grid-cols-1 gap-10 items-center lg:grid-cols-2 lg:gap-12">
           {/* Content */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center lg:text-left"
-            style={{ order: 2 }}
+            className="text-center lg:text-left order-2 lg:order-1"
           >
-            <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+            <div className="flex flex-col gap-7">
               {/* Badge */}
               <div>
-                <span
-                  className="glass inline-flex items-center rounded-full"
-                  style={{ gap: "0.5rem", padding: "0.375rem 0.75rem" }}
-                >
-                  <span
-                    className="bg-[#d5b36b] rounded-full pulse-glow"
-                    style={{ width: "0.5rem", height: "0.5rem" }}
-                  />
-                  <span
-                    className="font-medium text-[#d5b36b]"
-                    style={{ fontSize: "0.875rem" }}
-                  >
+                <span className="glass inline-flex items-center rounded-full gap-2 py-1.5 px-3">
+                  <span className="bg-primary-gold rounded-full pulse-glow size-2" />
+                  <span className="font-medium text-primary-gold text-sm">
                     Profesyonel Hizmet
                   </span>
                 </span>
               </div>
 
               {/* Heading */}
-              <h1 className="font-bold leading-tight flex flex-col" style={{ fontSize: "clamp(1.875rem, 5vw, 4.5rem)" }}>
-                <span className="text-white whitespace-nowrap">Güçlü Temeller,</span>
+              <h1 className="font-bold leading-tight flex flex-col text-fluid-hero">
+                <span className="text-theme-text whitespace-nowrap">Güçlü Temeller,</span>
                 <span className="text-gradient-gold whitespace-nowrap">Kalıcı Çözümler</span>
               </h1>
 
               {/* Description */}
-              <p
-                className="text-gray-300 leading-relaxed mx-auto lg:mx-0"
-                style={{ fontSize: "clamp(1rem, 1.5vw, 1.25rem)", maxWidth: "36rem" }}
-              >
+              <p className="text-theme-text-secondary leading-relaxed mx-auto lg:mx-0 text-fluid-body max-w-xl">
                 Güçlü ekipmanlarımız ve profesyonel ekibimiz ile istinat duvarı,
                 hafriyat ve arazi düzenleme projelerinizi en sağlam şekilde hayata
                 geçiriyoruz.
               </p>
 
               {/* Features */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <div className="flex flex-col gap-3">
                 {features.map((feature) => (
                   <div
                     key={feature}
-                    className="flex items-center justify-center lg:justify-start"
-                    style={{ gap: "0.75rem" }}
+                    className="flex items-center justify-center lg:justify-start gap-3"
                   >
-                    <CheckCircle
-                      className="text-[#d5b36b] shrink-0"
-                      style={{ width: "1.375rem", height: "1.375rem" }}
-                    />
-                    <span className="text-white font-medium" style={{ fontSize: "1rem" }}>
+                    <CheckCircle className="text-primary-gold shrink-0 size-[1.375rem]" />
+                    <span className="text-theme-text font-medium text-base">
                       {feature}
                     </span>
                   </div>
@@ -104,48 +71,32 @@ export default function Hero() {
               </div>
 
               {/* CTA Buttons */}
-              <div
-                className="flex flex-col sm:flex-row justify-center lg:justify-start"
-                style={{ gap: "1rem" }}
-              >
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                 <a
                   href="https://wa.me/905337711182"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-primary flex items-center justify-center text-center"
-                  style={{ gap: "0.5rem", padding: "0.875rem 1.75rem", fontSize: "1rem" }}
+                  className="btn-primary flex items-center justify-center text-center gap-2"
                 >
-                  <MessageCircle style={{ width: "1.25rem", height: "1.25rem" }} />
+                  <MessageCircle className="size-5" />
                   <span>Hemen İletişime Geç</span>
                 </a>
                 <a
                   href="#projeler"
-                  className="glass text-white font-semibold hover:bg-white/10 transition-all duration-300 text-center border border-[#d5b36b]/30 hover:border-[#d5b36b]"
-                  style={{ padding: "0.875rem 1.75rem", borderRadius: "0.5rem", fontSize: "1rem" }}
+                  className="glass text-theme-text font-semibold hover:bg-white/10 transition-all duration-300 text-center border border-primary-gold/30 hover:border-primary-gold py-3.5 px-7 rounded-lg text-base"
                 >
                   Projelerimizi İncele
                 </a>
               </div>
 
               {/* Stats */}
-              <div
-                className="border-t border-gray-700/50"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "1.5rem",
-                  paddingTop: "1.75rem",
-                }}
-              >
+              <div className="border-t border-theme-border grid grid-cols-3 gap-6 pt-7">
                 {stats.map((stat) => (
                   <div key={stat.label} className="text-center">
-                    <h3
-                      className="font-bold text-gradient-gold"
-                      style={{ fontSize: "clamp(1.5rem, 2.5vw, 1.875rem)" }}
-                    >
+                    <h3 className="font-bold text-gradient-gold text-fluid-stat">
                       {stat.value}
                     </h3>
-                    <p className="text-gray-400" style={{ fontSize: "0.875rem", marginTop: "0.25rem" }}>
+                    <p className="text-theme-text-muted text-sm mt-1">
                       {stat.label}
                     </p>
                   </div>
@@ -159,21 +110,10 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative flex justify-center lg:justify-end"
-            style={{ order: 1 }}
+            className="relative flex justify-center lg:justify-end order-1 lg:order-2"
           >
-            <div
-              className="relative overflow-hidden glass w-full"
-              style={{
-                borderRadius: "1rem",
-                padding: "0.5rem",
-                maxWidth: "32rem",
-              }}
-            >
-              <div
-                className="relative overflow-hidden"
-                style={{ borderRadius: "0.75rem", aspectRatio: "4/5" }}
-              >
+            <div className="relative overflow-hidden glass w-full rounded-2xl p-2 max-w-lg">
+              <div className="relative overflow-hidden rounded-xl aspect-[4/5]">
                 <Image
                   src="/hero.jpg"
                   alt="Yunus İnşaat - Profesyonel Hafriyat ve İnşaat"
@@ -189,17 +129,13 @@ export default function Hero() {
       </div>
 
       {/* Scroll Indicator */}
-      <div
-        className="absolute left-1/2 hidden md:flex"
-        style={{ bottom: "2rem", transform: "translateX(-50%)" }}
-      >
+      <div className="absolute left-1/2 hidden md:flex bottom-8 -translate-x-1/2">
         <a
           href="#hakkimizda"
-          className="flex flex-col items-center text-[#d5b36b] hover:text-white transition-colors duration-300"
-          style={{ gap: "0.25rem", opacity: 0.7 }}
+          className="flex flex-col items-center text-primary-gold hover:text-white transition-colors duration-300 gap-1 opacity-70"
         >
-          <span className="font-medium" style={{ fontSize: "0.75rem" }}>Aşağı Kaydır</span>
-          <ChevronDown className="animate-bounce" style={{ width: "1.25rem", height: "1.25rem" }} />
+          <span className="font-medium text-xs">Aşağı Kaydır</span>
+          <ChevronDown className="animate-bounce size-5" />
         </a>
       </div>
     </section>
