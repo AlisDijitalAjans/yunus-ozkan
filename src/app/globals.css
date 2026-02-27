@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import '../styles/_variables.scss';
+@import '../styles/_keyframe-animations.scss';
 
 @theme inline {
   --color-primary-gold: #d5b36b;
@@ -140,7 +142,7 @@ body::before {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -149,11 +151,34 @@ body::before {
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-primary-gold);
-  border-radius: 5px;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #c9a961;
+}
+
+/* Sidebar thin scrollbar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
 }
 
 /* Gold Gradient */

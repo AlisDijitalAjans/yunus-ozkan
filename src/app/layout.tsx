@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import CursorFollower from "@/components/CursorFollower";
+import LayoutShell from "@/components/LayoutShell";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -27,10 +25,7 @@ export default function RootLayout({
     <html lang="tr" data-theme="dark">
       <body className={`${poppins.variable} font-[family-name:var(--font-poppins)] antialiased`}>
         <ThemeProvider>
-          <CursorFollower />
-          <Header />
-          <main>{children}</main>
-          <Footer />
+          <LayoutShell>{children}</LayoutShell>
         </ThemeProvider>
       </body>
     </html>
