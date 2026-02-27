@@ -120,7 +120,11 @@ const services = [
   },
 ];
 
-export default function Services() {
+interface ServicesProps {
+  showHeader?: boolean;
+}
+
+export default function Services({ showHeader = true }: ServicesProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [activeService, setActiveService] = useState<(typeof services)[0] | null>(null);
 
@@ -138,54 +142,30 @@ export default function Services() {
 
   return (
     <section id="hizmetler" className="section-padding relative overflow-hidden">
-      <div className="container-custom relative" style={{ zIndex: 10 }}>
+      <div className="container-custom relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          style={{
-            maxWidth: "48rem",
-            marginBottom: "3rem",
-            textAlign: "center",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          <span
-            className="inline-block glass rounded-full text-[#d5b36b] font-semibold"
-            style={{
-              padding: "0.375rem 1rem",
-              fontSize: "0.875rem",
-              marginBottom: "1rem",
-            }}
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mb-12 text-center mx-auto"
           >
-            Hizmetlerimiz
-          </span>
-          <h2
-            className="font-bold text-white"
-            style={{
-              fontSize: "clamp(1.875rem, 4vw, 3rem)",
-              marginBottom: "1.25rem",
-            }}
-          >
-            <span className="text-gradient-gold">Profesyonel</span> İnşaat Çözümleri
-          </h2>
-          <p className="text-gray-300 leading-relaxed" style={{ fontSize: "1.125rem" }}>
-            Kendi ekipmanlarımızla sunduğumuz geniş hizmet yelpazesi
-          </p>
-        </motion.div>
+            <span className="inline-block glass rounded-full text-primary-gold font-semibold py-1.5 px-4 text-sm mb-4">
+              Hizmetlerimiz
+            </span>
+            <h2 className="font-bold text-theme-text text-fluid-section mb-5">
+              <span className="text-gradient-gold">Profesyonel</span> İnşaat Çözümleri
+            </h2>
+            <p className="text-theme-text-secondary leading-relaxed text-lg">
+              Kendi ekipmanlarımızla sunduğumuz geniş hizmet yelpazesi
+            </p>
+          </motion.div>
+        )}
 
         {/* Services Grid */}
-        <div
-          className="services-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "1.25rem",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {services.map((service, index) => (
             <motion.div
               key={service.title}
@@ -193,18 +173,11 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="glass group overflow-hidden border border-transparent hover:border-[#d5b36b]/50 transition-all duration-500 cursor-pointer"
-              style={{ borderRadius: "1rem" }}
+              className="glass group overflow-hidden border border-transparent hover:border-primary-gold/50 transition-all duration-500 cursor-pointer rounded-2xl"
               onClick={() => openModal(service)}
             >
               {/* Media */}
-              <div
-                style={{
-                  position: "relative",
-                  overflow: "hidden",
-                  aspectRatio: "1/1",
-                }}
-              >
+              <div className="relative overflow-hidden aspect-square">
                 {service.mediaType === "video" ? (
                   <video
                     src={service.image}
@@ -212,11 +185,7 @@ export default function Services() {
                     autoPlay
                     loop
                     playsInline
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
+                    className="w-full h-full object-cover"
                   />
                 ) : (
                   <Image
@@ -227,50 +196,22 @@ export default function Services() {
                   />
                 )}
                 {/* Icon Badge */}
-                <div
-                  className="gold-gradient group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-                  style={{
-                    position: "absolute",
-                    bottom: "0.75rem",
-                    left: "0.75rem",
-                    width: "2.75rem",
-                    height: "2.75rem",
-                    borderRadius: "0.625rem",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 10,
-                  }}
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style={{ color: "black" }}>
+                <div className="gold-gradient group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 absolute bottom-3 left-3 size-11 rounded-lg flex items-center justify-center z-10">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-black">
                     <path d={service.iconPath} />
                   </svg>
                 </div>
               </div>
 
               {/* Content */}
-              <div style={{ padding: "1.25rem" }}>
-                <h3
-                  className="font-bold text-white group-hover:text-[#d5b36b] transition-colors duration-300"
-                  style={{ fontSize: "1.125rem", marginBottom: "0.375rem" }}
-                >
+              <div className="p-5">
+                <h3 className="font-bold text-theme-text group-hover:text-primary-gold transition-colors duration-300 text-lg mb-1.5">
                   {service.title}
                 </h3>
-                <p
-                  className="text-gray-400 leading-relaxed"
-                  style={{ fontSize: "0.875rem", marginBottom: "0.875rem" }}
-                >
+                <p className="text-theme-text-muted leading-relaxed text-sm mb-3.5">
                   {service.desc}
                 </p>
-                <span
-                  className="text-[#d5b36b] font-semibold group-hover:translate-x-1 transition-transform duration-300"
-                  style={{
-                    fontSize: "0.875rem",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.375rem",
-                  }}
-                >
+                <span className="text-primary-gold font-semibold group-hover:translate-x-1 transition-transform duration-300 text-sm inline-flex items-center gap-1.5">
                   Detayları Öğren
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 12h14M12 5l7 7-7 7" />
@@ -285,17 +226,7 @@ export default function Services() {
       {/* Detail Modal */}
       <AnimatePresence>
         {modalOpen && activeService && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 100000,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "1rem",
-            }}
-          >
+          <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
             {/* Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -303,12 +234,7 @@ export default function Services() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={closeModal}
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: "rgba(0, 0, 0, 0.8)",
-                backdropFilter: "blur(8px)",
-              }}
+              className="absolute inset-0 bg-black/80 backdrop-blur"
             />
 
             {/* Modal Content */}
@@ -317,91 +243,45 @@ export default function Services() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="glass"
-              style={{
-                position: "relative",
-                zIndex: 10,
-                maxWidth: "32rem",
-                width: "100%",
-                borderRadius: "1.5rem",
-                padding: "2rem",
-                border: "1px solid rgba(213, 179, 107, 0.3)",
-                maxHeight: "90vh",
-                overflowY: "auto",
-              }}
+              className="glass relative z-10 max-w-lg w-full rounded-3xl p-8 border border-primary-gold/30 max-h-[90vh] overflow-y-auto"
             >
               {/* Close Button */}
               <button
                 onClick={closeModal}
-                className="text-gray-400 hover:text-white transition-colors duration-300"
-                style={{
-                  position: "absolute",
-                  top: "1rem",
-                  right: "1rem",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="text-theme-text-muted hover:text-theme-text transition-colors duration-300 absolute top-4 right-4"
                 aria-label="Kapat"
               >
-                <X style={{ width: "1.5rem", height: "1.5rem" }} />
+                <X className="size-6" />
               </button>
 
               {/* Icon */}
-              <div
-                className="gold-gradient"
-                style={{
-                  width: "3.5rem",
-                  height: "3.5rem",
-                  borderRadius: "0.75rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: "1.25rem",
-                }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{ color: "black" }}>
+              <div className="gold-gradient size-14 rounded-xl flex items-center justify-center mb-5">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" className="text-black">
                   <path d={activeService.iconPath} />
                 </svg>
               </div>
 
-              <h3
-                className="font-bold text-white"
-                style={{ fontSize: "1.5rem", marginBottom: "0.75rem" }}
-              >
+              <h3 className="font-bold text-theme-text text-2xl mb-3">
                 {activeService.title}
               </h3>
 
-              <p
-                className="text-gray-300 leading-relaxed"
-                style={{ fontSize: "1rem", marginBottom: "1.5rem" }}
-              >
+              <p className="text-theme-text-secondary leading-relaxed text-base mb-6">
                 {activeService.fullDesc}
               </p>
 
               {/* Features */}
-              <div style={{ marginBottom: "1.75rem" }}>
-                <h4
-                  className="font-semibold text-[#d5b36b]"
-                  style={{ fontSize: "1.125rem", marginBottom: "0.75rem" }}
-                >
+              <div className="mb-7">
+                <h4 className="font-semibold text-primary-gold text-lg mb-3">
                   Hizmet Kapsamı:
                 </h4>
-                <ul style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+                <ul className="flex flex-col gap-2.5">
                   {activeService.features.map((feature) => (
                     <li
                       key={feature}
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: "0.625rem",
-                      }}
+                      className="flex items-start gap-2.5"
                     >
-                      <CheckCircle
-                        className="text-[#d5b36b] shrink-0"
-                        style={{ width: "1.25rem", height: "1.25rem", marginTop: "0.125rem" }}
-                      />
-                      <span className="text-white" style={{ fontSize: "0.938rem" }}>
+                      <CheckCircle className="text-primary-gold shrink-0 size-5 mt-0.5" />
+                      <span className="text-theme-text text-sm">
                         {feature}
                       </span>
                     </li>
@@ -414,16 +294,9 @@ export default function Services() {
                 href="https://wa.me/905337711182"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.75rem 1.5rem",
-                  fontSize: "1rem",
-                }}
+                className="btn-primary inline-flex items-center gap-2"
               >
-                <MessageCircle style={{ width: "1.25rem", height: "1.25rem" }} />
+                <MessageCircle className="size-5" />
                 <span>Teklif Al</span>
               </a>
             </motion.div>

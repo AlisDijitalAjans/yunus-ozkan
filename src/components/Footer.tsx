@@ -28,20 +28,12 @@ export default function Footer() {
   return (
     <footer className="relative overflow-hidden">
       {/* Gold Line */}
-      <div style={{ height: "4px" }} className="w-full gold-gradient" />
+      <div className="w-full gold-gradient h-px" />
 
       <div className="section-padding">
         <div className="container-custom">
           {/* Footer Grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: "2.5rem",
-              marginBottom: "3.5rem",
-            }}
-            className="footer-grid"
-          >
+          <div className="grid grid-cols-1 gap-10 mb-14 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
             {/* Logo & About */}
             <div className="flex flex-col items-center md:items-start text-center md:text-left">
               <Image
@@ -49,21 +41,15 @@ export default function Footer() {
                 alt="Yunus İnşaat Logo"
                 width={160}
                 height={160}
-                style={{ height: "8rem", width: "auto", marginBottom: "1.5rem" }}
+                className="h-32 w-auto mb-6"
               />
-              <p
-                className="text-gray-300 leading-relaxed"
-                style={{ fontSize: "1rem", marginBottom: "1.5rem" }}
-              >
+              <p className="text-theme-text-secondary leading-relaxed text-base mb-6">
                 Kendi ekipmanlarımızla profesyonel inşaat, hafriyat ve arazi
                 düzenleme hizmetleri.
               </p>
-              <div
-                className="flex items-center justify-center md:justify-start text-[#d5b36b]"
-                style={{ gap: "0.5rem" }}
-              >
-                <CheckCircle style={{ width: "1.25rem", height: "1.25rem" }} />
-                <span className="font-semibold" style={{ fontSize: "1rem" }}>
+              <div className="flex items-center justify-center md:justify-start text-primary-gold gap-2">
+                <CheckCircle className="size-5" />
+                <span className="font-semibold text-base">
                   Güvenilir Hizmet
                 </span>
               </div>
@@ -71,21 +57,17 @@ export default function Footer() {
 
             {/* Quick Links */}
             <div className="text-center md:text-left">
-              <h3
-                className="font-bold text-white"
-                style={{ fontSize: "1.375rem", marginBottom: "1.5rem" }}
-              >
+              <h3 className="font-bold text-theme-text text-xl mb-6">
                 Hızlı Linkler
               </h3>
-              <ul style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+              <ul className="flex flex-col gap-3.5">
                 {quickLinks.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="text-gray-300 hover:text-[#d5b36b] transition-colors duration-300 inline-flex items-center"
-                      style={{ gap: "0.5rem", fontSize: "1rem" }}
+                      className="text-theme-text-secondary hover:text-primary-gold transition-colors duration-300 inline-flex items-center gap-2 text-base"
                     >
-                      <ChevronRight style={{ width: "1.125rem", height: "1.125rem" }} />
+                      <ChevronRight className="size-5" />
                       <span>{link.label}</span>
                     </a>
                   </li>
@@ -95,24 +77,17 @@ export default function Footer() {
 
             {/* Services */}
             <div className="text-center md:text-left">
-              <h3
-                className="font-bold text-white"
-                style={{ fontSize: "1.375rem", marginBottom: "1.5rem" }}
-              >
+              <h3 className="font-bold text-theme-text text-xl mb-6">
                 Hizmetlerimiz
               </h3>
-              <ul style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+              <ul className="flex flex-col gap-3.5">
                 {services.map((service) => (
                   <li key={service}>
                     <a
                       href="#hizmetler"
-                      className="text-gray-300 hover:text-[#d5b36b] transition-colors duration-300 inline-flex items-start"
-                      style={{ gap: "0.5rem", fontSize: "1rem" }}
+                      className="text-theme-text-secondary hover:text-primary-gold transition-colors duration-300 inline-flex items-start gap-2 text-base"
                     >
-                      <CheckCircle
-                        className="text-[#d5b36b] shrink-0"
-                        style={{ width: "1.25rem", height: "1.25rem", marginTop: "0.15rem" }}
-                      />
+                      <CheckCircle className="text-primary-gold shrink-0 size-5 mt-[0.15rem]" />
                       <span>{service}</span>
                     </a>
                   </li>
@@ -122,31 +97,22 @@ export default function Footer() {
 
             {/* Contact */}
             <div className="text-center md:text-left">
-              <h3
-                className="font-bold text-white"
-                style={{ fontSize: "1.375rem", marginBottom: "1.5rem" }}
-              >
+              <h3 className="font-bold text-theme-text text-xl mb-6">
                 İletişim
               </h3>
-              <ul style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+              <ul className="flex flex-col gap-5">
                 {/* Phone */}
                 <li>
                   <a
                     href="https://wa.me/905337711182"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-start text-gray-300 hover:text-[#d5b36b] transition-colors duration-300"
-                    style={{ gap: "0.75rem" }}
+                    className="inline-flex items-start text-theme-text-secondary hover:text-primary-gold transition-colors duration-300 gap-3"
                   >
-                    <Phone
-                      className="text-[#d5b36b] shrink-0"
-                      style={{ width: "1.5rem", height: "1.5rem" }}
-                    />
+                    <Phone className="text-primary-gold shrink-0 size-6" />
                     <div className="text-left">
-                      <p className="font-semibold" style={{ fontSize: "1rem" }}>
-                        Telefon
-                      </p>
-                      <p style={{ fontSize: "1rem" }}>0533 771 11 82</p>
+                      <p className="font-semibold text-base">Telefon</p>
+                      <p className="text-base">0533 771 11 82</p>
                     </div>
                   </a>
                 </li>
@@ -157,51 +123,37 @@ export default function Footer() {
                     href="https://wa.me/905337711182"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-start text-gray-300 hover:text-[#d5b36b] transition-colors duration-300"
-                    style={{ gap: "0.75rem" }}
+                    className="inline-flex items-start text-theme-text-secondary hover:text-primary-gold transition-colors duration-300 gap-3"
                   >
-                    <MessageCircle
-                      className="text-[#d5b36b] shrink-0"
-                      style={{ width: "1.5rem", height: "1.5rem" }}
-                    />
+                    <MessageCircle className="text-primary-gold shrink-0 size-6" />
                     <div className="text-left">
-                      <p className="font-semibold" style={{ fontSize: "1rem" }}>
-                        WhatsApp
-                      </p>
-                      <p style={{ fontSize: "1rem" }}>Hızlı İletişim</p>
+                      <p className="font-semibold text-base">WhatsApp</p>
+                      <p className="text-base">Hızlı İletişim</p>
                     </div>
                   </a>
                 </li>
 
                 {/* Social Media */}
                 <li>
-                  <p
-                    className="text-gray-300 font-semibold"
-                    style={{ fontSize: "1rem", marginBottom: "0.75rem" }}
-                  >
+                  <p className="text-theme-text-secondary font-semibold text-base mb-3">
                     Sosyal Medya
                   </p>
-                  <div
-                    className="flex justify-center md:justify-start"
-                    style={{ gap: "0.75rem" }}
-                  >
+                  <div className="flex justify-center md:justify-start gap-3">
                     <a
                       href="#"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-full glass flex items-center justify-center text-[#d5b36b] hover:bg-[#d5b36b] hover:text-black transition-all duration-300"
-                      style={{ width: "2.75rem", height: "2.75rem" }}
+                      className="rounded-full glass flex items-center justify-center text-primary-gold hover:bg-primary-gold hover:text-black transition-all duration-300 size-11"
                     >
-                      <Instagram style={{ width: "1.25rem", height: "1.25rem" }} />
+                      <Instagram className="size-5" />
                     </a>
                     <a
                       href="#"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-full glass flex items-center justify-center text-[#d5b36b] hover:bg-[#d5b36b] hover:text-black transition-all duration-300"
-                      style={{ width: "2.75rem", height: "2.75rem" }}
+                      className="rounded-full glass flex items-center justify-center text-primary-gold hover:bg-primary-gold hover:text-black transition-all duration-300 size-11"
                     >
-                      <Twitter style={{ width: "1.25rem", height: "1.25rem" }} />
+                      <Twitter className="size-5" />
                     </a>
                   </div>
                 </li>
@@ -210,63 +162,42 @@ export default function Footer() {
           </div>
 
           {/* CTA Box */}
-          <div
-            className="glass relative overflow-hidden"
-            style={{
-              borderRadius: "1.5rem",
-              padding: "2.5rem 2rem",
-              marginBottom: "3.5rem",
-            }}
-          >
+          <div className="glass relative overflow-hidden rounded-3xl py-10 px-8 mb-14">
             <div className="absolute inset-0 bg-gradient-to-r from-[#d5b36b]/20 to-transparent" />
-            <div className="relative z-10 text-center" style={{ maxWidth: "42rem", margin: "0 auto" }}>
-              <h3
-                className="font-bold text-white"
-                style={{ fontSize: "2rem", marginBottom: "1rem" }}
-              >
+            <div className="relative z-10 text-center max-w-2xl mx-auto">
+              <h3 className="font-bold text-theme-text text-[2rem] mb-4">
                 Projeniz İçin{" "}
                 <span className="text-gradient-gold">Teklif Alın</span>
               </h3>
-              <p
-                className="text-gray-300"
-                style={{ fontSize: "1.125rem", marginBottom: "2rem" }}
-              >
+              <p className="text-theme-text-secondary text-lg mb-8">
                 Profesyonel ekibimizle projelerinizi hayata geçiriyoruz.
               </p>
               <a
                 href="https://wa.me/905337711182"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary inline-flex items-center"
-                style={{ gap: "0.625rem", padding: "0.875rem 1.75rem", fontSize: "1rem" }}
+                className="btn-primary inline-flex items-center gap-2.5"
               >
-                <MessageCircle style={{ width: "1.25rem", height: "1.25rem" }} />
+                <MessageCircle className="size-5" />
                 <span>Hemen WhatsApp ile İletişime Geç</span>
               </a>
             </div>
           </div>
 
           {/* Bottom Bar */}
-          <div
-            className="border-t border-gray-700/50"
-            style={{ paddingTop: "2rem" }}
-          >
-            <div
-              className="flex flex-col md:flex-row items-center justify-between text-center md:text-left"
-              style={{ gap: "0.75rem" }}
-            >
-              <p className="text-gray-400" style={{ fontSize: "0.875rem" }}>
+          <div className="border-t border-theme-border pt-8">
+            <div className="flex flex-col md:flex-row items-center justify-between text-center md:text-left gap-3">
+              <p className="text-theme-text-muted text-sm">
                 Güvenilir hizmet anlayışı.
               </p>
               <a
                 href="https://alisdijital.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#d5b36b] transition-colors duration-300"
-                style={{ fontSize: "0.875rem" }}
+                className="text-theme-text-muted hover:text-primary-gold transition-colors duration-300 text-sm"
               >
                 Web Tasarım Ajansı:{" "}
-                <span className="text-[#d5b36b] font-semibold">
+                <span className="text-primary-gold font-semibold">
                   Alis Dijital
                 </span>
               </a>

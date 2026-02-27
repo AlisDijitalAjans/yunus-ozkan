@@ -55,7 +55,11 @@ function VolumeOffIcon() {
 // Sonsuz loop için videoları 2 kat çoğalt
 const slides = [...projects, ...projects];
 
-export default function Projects() {
+interface ProjectsProps {
+  showHeader?: boolean;
+}
+
+export default function Projects({ showHeader = true }: ProjectsProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
     loop: true,
@@ -111,117 +115,56 @@ export default function Projects() {
 
   return (
     <section id="projeler" className="section-padding relative overflow-hidden">
-      <div className="container-custom relative" style={{ zIndex: 10 }}>
+      <div className="container-custom relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          style={{
-            maxWidth: "48rem",
-            marginBottom: "2.5rem",
-            textAlign: "center",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          <span
-            className="inline-block glass rounded-full text-[#d5b36b] font-semibold"
-            style={{
-              padding: "0.375rem 1rem",
-              fontSize: "0.875rem",
-              marginBottom: "1rem",
-            }}
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mb-10 text-center mx-auto"
           >
-            Projelerimiz
-          </span>
-          <h2
-            className="font-bold text-white"
-            style={{
-              fontSize: "clamp(1.875rem, 4vw, 3rem)",
-              marginBottom: "1.25rem",
-            }}
-          >
-            Tamamlanan{" "}
-            <span className="text-gradient-gold">Projeler</span>
-          </h2>
-          <p
-            className="text-gray-300 leading-relaxed"
-            style={{ fontSize: "1.125rem" }}
-          >
-            Profesyonel ekibimiz ve modern ekipmanlarımız ile tamamladığımız
-            projelerden bazıları.
-          </p>
-        </motion.div>
+            <span className="inline-block glass rounded-full text-primary-gold font-semibold py-1.5 px-4 text-sm mb-4">
+              Projelerimiz
+            </span>
+            <h2 className="font-bold text-theme-text text-fluid-section mb-5">
+              Tamamlanan{" "}
+              <span className="text-gradient-gold">Projeler</span>
+            </h2>
+            <p className="text-theme-text-secondary leading-relaxed text-lg">
+              Profesyonel ekibimiz ve modern ekipmanlarımız ile tamamladığımız
+              projelerden bazıları.
+            </p>
+          </motion.div>
+        )}
 
         {/* Keen Slider */}
-        <div style={{ position: "relative" }}>
+        <div className="relative">
           {/* Prev Arrow */}
           <button
             onClick={() => instanceRef.current?.prev()}
-            className="hidden md:flex glass text-white hover:text-[#d5b36b] hover:bg-white/10 transition-all duration-300"
-            style={{
-              position: "absolute",
-              left: "-1.5rem",
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 20,
-              width: "3rem",
-              height: "3rem",
-              borderRadius: "50%",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              cursor: "pointer",
-            }}
+            className="hidden md:flex glass text-white hover:text-primary-gold hover:bg-white/10 transition-all duration-300 absolute -left-6 top-1/2 -translate-y-1/2 z-20 size-12 rounded-full items-center justify-center"
             aria-label="Önceki"
           >
-            <ChevronLeft style={{ width: "1.5rem", height: "1.5rem" }} />
+            <ChevronLeft className="size-6" />
           </button>
 
           {/* Next Arrow */}
           <button
             onClick={() => instanceRef.current?.next()}
-            className="hidden md:flex glass text-white hover:text-[#d5b36b] hover:bg-white/10 transition-all duration-300"
-            style={{
-              position: "absolute",
-              right: "-1.5rem",
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 20,
-              width: "3rem",
-              height: "3rem",
-              borderRadius: "50%",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              cursor: "pointer",
-            }}
+            className="hidden md:flex glass text-white hover:text-primary-gold hover:bg-white/10 transition-all duration-300 absolute -right-6 top-1/2 -translate-y-1/2 z-20 size-12 rounded-full items-center justify-center"
             aria-label="Sonraki"
           >
-            <ChevronRight style={{ width: "1.5rem", height: "1.5rem" }} />
+            <ChevronRight className="size-6" />
           </button>
 
           {/* Slider */}
           <div ref={sliderRef} className="keen-slider">
             {slides.map((project, index) => (
               <div key={`${project.title}-${index}`} className="keen-slider__slide">
-                <div
-                  className="glass group border border-transparent hover:border-[#d5b36b]/50 transition-all duration-500"
-                  style={{
-                    borderRadius: "1rem",
-                    overflow: "hidden",
-                    position: "relative",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "relative",
-                      aspectRatio: "9/16",
-                      overflow: "hidden",
-                    }}
-                  >
+                <div className="glass group border border-transparent hover:border-primary-gold/50 transition-all duration-500 rounded-2xl overflow-hidden relative">
+                  <div className="relative aspect-[9/16] overflow-hidden">
                     <video
                       ref={(el) => {
                         videoRefs.current[index] = el;
@@ -231,84 +174,38 @@ export default function Projects() {
                       autoPlay
                       loop
                       playsInline
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      className="w-full h-full object-cover"
                     />
 
                     {/* Gradient Overlay */}
                     <div
+                      className="absolute inset-0 pointer-events-none"
                       style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)",
-                        pointerEvents: "none",
+                        background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%)",
                       }}
                     />
 
                     {/* Sound Toggle */}
                     <button
                       onClick={() => toggleMute(index)}
-                      className="glass hover:bg-white/20 transition-all duration-300"
-                      style={{
-                        position: "absolute",
-                        top: "0.75rem",
-                        right: "0.75rem",
-                        zIndex: 10,
-                        width: "2.5rem",
-                        height: "2.5rem",
-                        borderRadius: "50%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "white",
-                        cursor: "pointer",
-                        border: "none",
-                      }}
+                      className="glass hover:bg-white/20 transition-all duration-300 absolute top-3 right-3 z-10 size-10 rounded-full flex items-center justify-center text-white cursor-pointer"
                       aria-label={mutedStates[index] ? "Sesi Aç" : "Sesi Kapat"}
                     >
                       {mutedStates[index] ? <VolumeOffIcon /> : <VolumeOnIcon />}
                     </button>
 
                     {/* Video Info */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        padding: "1.25rem",
-                        zIndex: 10,
-                      }}
-                    >
-                      <h3
-                        className="font-bold"
-                        style={{
-                          fontSize: "clamp(0.875rem, 1.5vw, 1.125rem)",
-                          marginBottom: "0.625rem",
-                          color: "#ffffff",
-                        }}
-                      >
+                    <div className="absolute bottom-0 inset-x-0 p-5 z-10">
+                      <h3 className="font-bold text-fluid-card-title mb-2.5 text-white">
                         {project.title}
                       </h3>
                       <button
                         onClick={() => openModal(project)}
-                        className="btn-primary text-sm"
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.375rem",
-                          padding: "0.5rem 1rem",
-                          fontSize: "0.875rem",
-                          cursor: "pointer",
-                          border: "none",
-                        }}
+                        className="btn-primary text-sm inline-flex items-center gap-1.5"
+                        style={{ padding: "0.5rem 1rem" }}
                       >
                         <span>Detayları Gör</span>
-                        <ChevronRight style={{ width: "1rem", height: "1rem" }} />
+                        <ChevronRight className="size-4" />
                       </button>
                     </div>
                   </div>
@@ -322,29 +219,14 @@ export default function Projects() {
       {/* Detail Modal */}
       <AnimatePresence>
         {modalOpen && activeProject && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 100000,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "1rem",
-            }}
-          >
+          <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={closeModal}
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: "rgba(0, 0, 0, 0.8)",
-                backdropFilter: "blur(8px)",
-              }}
+              className="absolute inset-0 bg-black/80 backdrop-blur"
             />
 
             <motion.div
@@ -352,54 +234,23 @@ export default function Projects() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="glass"
-              style={{
-                position: "relative",
-                zIndex: 10,
-                maxWidth: "32rem",
-                width: "100%",
-                borderRadius: "1.5rem",
-                padding: "2rem",
-                border: "1px solid rgba(213, 179, 107, 0.3)",
-              }}
+              className="glass relative z-10 max-w-lg w-full rounded-3xl p-8 border border-primary-gold/30"
             >
               <button
                 onClick={closeModal}
-                className="text-gray-400 hover:text-white transition-colors duration-300"
-                style={{
-                  position: "absolute",
-                  top: "1rem",
-                  right: "1rem",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="text-theme-text-muted hover:text-theme-text transition-colors duration-300 absolute top-4 right-4"
                 aria-label="Kapat"
               >
-                <X style={{ width: "1.5rem", height: "1.5rem" }} />
+                <X className="size-6" />
               </button>
 
-              <div
-                className="gold-gradient"
-                style={{
-                  width: "3rem",
-                  height: "0.25rem",
-                  borderRadius: "9999px",
-                  marginBottom: "1.25rem",
-                }}
-              />
+              <div className="gold-gradient w-12 h-1 rounded-full mb-5" />
 
-              <h3
-                className="font-bold text-white"
-                style={{ fontSize: "1.5rem", marginBottom: "1rem" }}
-              >
+              <h3 className="font-bold text-theme-text text-2xl mb-4">
                 {activeProject.title}
               </h3>
 
-              <p
-                className="text-gray-300 leading-relaxed"
-                style={{ fontSize: "1rem", marginBottom: "1.75rem" }}
-              >
+              <p className="text-theme-text-secondary leading-relaxed text-base mb-7">
                 {activeProject.description}
               </p>
 
@@ -407,16 +258,9 @@ export default function Projects() {
                 href="https://wa.me/905337711182"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.75rem 1.5rem",
-                  fontSize: "1rem",
-                }}
+                className="btn-primary inline-flex items-center gap-2"
               >
-                <MessageCircle style={{ width: "1.25rem", height: "1.25rem" }} />
+                <MessageCircle className="size-5" />
                 <span>Teklif Al</span>
               </a>
             </motion.div>

@@ -36,39 +36,38 @@ const equipmentCards = [
   },
 ];
 
-export default function About() {
+interface AboutProps {
+  showHeader?: boolean;
+}
+
+export default function About({ showHeader = true }: AboutProps) {
   return (
     <section
       id="hakkimizda"
       className="section-padding relative overflow-hidden"
     >
-      <div className="container-custom relative" style={{ zIndex: 10 }}>
+      <div className="container-custom relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mx-auto"
-          style={{ maxWidth: "48rem", marginBottom: "3rem", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}
-        >
-          <span
-            className="inline-block glass rounded-full text-[#d5b36b] font-semibold"
-            style={{ padding: "0.375rem 1rem", fontSize: "0.875rem", marginBottom: "1rem" }}
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mx-auto max-w-3xl mb-12"
           >
-            Neden Yunus Özkan İnşaat?
-          </span>
-          <h2
-            className="font-bold text-white"
-            style={{ fontSize: "clamp(1.875rem, 4vw, 3rem)", marginBottom: "1.25rem" }}
-          >
-            <span className="text-gradient-gold">Kesintisiz Hizmet</span> - Garantili İşçilik
-          </h2>
-          <p className="text-gray-300 leading-relaxed" style={{ fontSize: "1.125rem" }}>
-            Profesyonel ekibimiz ve modern ekipmanlarımız ile projelerinizi baştan sona
-            kesintisiz ve garantili bir şekilde tamamlıyoruz.
-          </p>
-        </motion.div>
+            <span className="inline-block glass rounded-full text-primary-gold font-semibold py-1.5 px-4 text-sm mb-4">
+              Neden Yunus Özkan İnşaat?
+            </span>
+            <h2 className="font-bold text-theme-text text-fluid-section mb-5">
+              <span className="text-gradient-gold">Kesintisiz Hizmet</span> - Garantili İşçilik
+            </h2>
+            <p className="text-theme-text-secondary leading-relaxed text-lg">
+              Profesyonel ekibimiz ve modern ekipmanlarımız ile projelerinizi baştan sona
+              kesintisiz ve garantili bir şekilde tamamlıyoruz.
+            </p>
+          </motion.div>
+        )}
 
         {/* Main Content Box */}
         <motion.div
@@ -76,83 +75,49 @@ export default function About() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="glass relative overflow-hidden"
-          style={{ borderRadius: "1.5rem", padding: "2rem", marginBottom: "3rem" }}
+          className="glass relative overflow-hidden rounded-3xl p-8 mb-12"
         >
           {/* Background Glow */}
-          <div
-            className="absolute bg-[#d5b36b] rounded-full"
-            style={{
-              top: 0,
-              right: 0,
-              width: "20rem",
-              height: "20rem",
-              filter: "blur(64px)",
-              opacity: 0.1,
-            }}
-          />
+          <div className="absolute top-0 right-0 bg-primary-gold rounded-full w-80 h-80 blur-[64px] opacity-10" />
 
-          <div
-            className="relative about-content-grid"
-            style={{
-              zIndex: 10,
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: "2.5rem",
-              alignItems: "center",
-            }}
-          >
+          <div className="relative z-10 grid grid-cols-1 gap-10 items-center lg:grid-cols-2 lg:gap-12">
             {/* Image */}
-            <div className="relative group" style={{ order: 1 }}>
-              <div className="relative overflow-hidden" style={{ borderRadius: "1rem" }}>
+            <div className="relative group order-1">
+              <div className="relative overflow-hidden rounded-2xl">
                 <Image
                   src="/about.jpg"
                   alt="Yunus Özkan İnşaat - Profesyonel Ekip"
                   width={600}
                   height={750}
-                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
-                  style={{ aspectRatio: "4/5" }}
+                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700 aspect-[4/5]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               </div>
             </div>
 
             {/* Content */}
-            <div style={{ order: 2, display: "flex", flexDirection: "column", gap: "2rem" }}>
+            <div className="order-2 flex flex-col gap-8">
               <div>
-                <h3
-                  className="font-bold text-white"
-                  style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)", marginBottom: "1rem" }}
-                >
+                <h3 className="font-bold text-theme-text text-fluid-subsection mb-4">
                   <span className="text-gradient-gold">Profesyonel</span> Çözümler
                 </h3>
-                <p className="text-gray-300 leading-relaxed" style={{ fontSize: "1.063rem" }}>
+                <p className="text-theme-text-secondary leading-relaxed text-base">
                   Modern ekipmanlarımız ve deneyimli ekibimizle projelerinizde hiçbir aksaklık
                   yaşanmaz. Zamanlama ve kalite kontrolü tamamen bizim elimizdedir.
                 </p>
               </div>
 
               {/* Stats Grid */}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
-                  gap: "0.875rem",
-                }}
-              >
+              <div className="grid grid-cols-2 gap-3.5">
                 {statsData.map((stat) => (
                   <div
                     key={stat.label}
-                    className="glass hover:bg-white/10 transition-all duration-300 cursor-pointer border border-transparent hover:border-[#d5b36b]/30"
-                    style={{ borderRadius: "1rem", padding: "1.25rem" }}
+                    className="glass hover:bg-white/10 transition-all duration-300 cursor-pointer border border-transparent hover:border-primary-gold/30 rounded-2xl p-5"
                   >
-                    <div
-                      className="font-bold text-gradient-gold"
-                      style={{ fontSize: "clamp(1.5rem, 2.5vw, 2.25rem)", marginBottom: "0.25rem" }}
-                    >
+                    <div className="font-bold text-gradient-gold text-fluid-stat-lg mb-1">
                       {stat.value}
                     </div>
-                    <p className="text-gray-300 font-medium" style={{ fontSize: "0.938rem" }}>
+                    <p className="text-theme-text-secondary font-medium text-sm">
                       {stat.label}
                     </p>
                   </div>
@@ -160,23 +125,16 @@ export default function About() {
               </div>
 
               {/* Features List */}
-              <ul style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
+              <ul className="flex flex-col gap-3.5">
                 {featuresList.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start group"
-                    style={{ gap: "0.75rem" }}
+                    className="flex items-start group gap-3"
                   >
-                    <div
-                      className="gold-gradient flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300"
-                      style={{ width: "1.5rem", height: "1.5rem", borderRadius: "0.375rem" }}
-                    >
-                      <Check
-                        className="text-black"
-                        style={{ width: "1rem", height: "1rem" }}
-                      />
+                    <div className="gold-gradient flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 size-6 rounded-md">
+                      <Check className="text-black size-4" />
                     </div>
-                    <span className="text-white font-medium" style={{ fontSize: "1rem" }}>
+                    <span className="text-theme-text font-medium text-base">
                       {feature}
                     </span>
                   </li>
@@ -187,14 +145,7 @@ export default function About() {
         </motion.div>
 
         {/* Equipment Cards */}
-        <div
-          className="equipment-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gap: "1.25rem",
-          }}
-        >
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
           {equipmentCards.map((card) => {
             const Icon = card.icon;
             return (
@@ -204,29 +155,17 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="glass hover:bg-white/10 transition-all duration-500 group relative overflow-hidden border border-transparent hover:border-[#d5b36b]/50"
-                style={{ borderRadius: "1rem", padding: "1.75rem" }}
+                className="glass hover:bg-white/10 transition-all duration-500 group relative overflow-hidden border border-transparent hover:border-primary-gold/50 rounded-2xl p-7"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#d5b36b]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative" style={{ zIndex: 10 }}>
-                  <div
-                    className="gold-gradient flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500"
-                    style={{
-                      width: "3.5rem",
-                      height: "3.5rem",
-                      borderRadius: "0.75rem",
-                      marginBottom: "1.25rem",
-                    }}
-                  >
-                    <Icon className="text-black" style={{ width: "1.75rem", height: "1.75rem" }} />
+                <div className="relative z-10">
+                  <div className="gold-gradient flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 size-14 rounded-xl mb-5">
+                    <Icon className="text-black size-7" />
                   </div>
-                  <h3
-                    className="font-bold text-white group-hover:text-[#d5b36b] transition-colors duration-300"
-                    style={{ fontSize: "1.25rem", marginBottom: "0.625rem" }}
-                  >
+                  <h3 className="font-bold text-theme-text group-hover:text-primary-gold transition-colors duration-300 text-xl mb-2.5">
                     {card.title}
                   </h3>
-                  <p className="text-gray-300 leading-relaxed" style={{ fontSize: "0.938rem" }}>
+                  <p className="text-theme-text-secondary leading-relaxed text-sm">
                     {card.desc}
                   </p>
                 </div>

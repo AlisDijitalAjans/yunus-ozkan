@@ -26,7 +26,12 @@ const galleryItems = [
 // Smooth loop için görselleri çoğalt
 const slides = [...galleryItems, ...galleryItems];
 
-export default function Gallery() {
+interface GalleryProps {
+  showHeader?: boolean;
+  variant?: "slider" | "grid";
+}
+
+export default function Gallery({ showHeader = true, variant = "slider" }: GalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -50,8 +55,7 @@ export default function Gallery() {
   });
 
   const openLightbox = (index: number) => {
-    // slides dizisi çoğaltılmış, orijinal index'i bul
-    const realIndex = index % galleryItems.length;
+    const realIndex = variant === "slider" ? index % galleryItems.length : index;
     setActiveIndex(realIndex);
     setLightboxOpen(true);
     document.body.style.overflow = "hidden";
@@ -72,160 +76,133 @@ export default function Gallery() {
 
   return (
     <section id="galeri" className="section-padding relative overflow-hidden">
-      <div className="container-custom relative" style={{ zIndex: 10 }}>
+      <div className="container-custom relative z-10">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          style={{
-            maxWidth: "48rem",
-            marginBottom: "2.5rem",
-            textAlign: "center",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
-        >
-          <span
-            className="inline-block glass rounded-full text-[#d5b36b] font-semibold"
-            style={{
-              padding: "0.375rem 1rem",
-              fontSize: "0.875rem",
-              marginBottom: "1rem",
-            }}
+        {showHeader && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl mb-10 text-center mx-auto"
           >
-            Galeri
-          </span>
-          <h2
-            className="font-bold text-white"
-            style={{
-              fontSize: "clamp(1.875rem, 4vw, 3rem)",
-              marginBottom: "1.25rem",
-            }}
-          >
-            Projelerimizden <span className="text-gradient-gold">Kareler</span>
-          </h2>
-          <p className="text-gray-300 leading-relaxed" style={{ fontSize: "1.125rem" }}>
-            Tamamladığımız projelerden fotoğraf galerisi
-          </p>
-        </motion.div>
+            <span className="inline-block glass rounded-full text-primary-gold font-semibold py-1.5 px-4 text-sm mb-4">
+              Galeri
+            </span>
+            <h2 className="font-bold text-theme-text text-fluid-section mb-5">
+              Projelerimizden <span className="text-gradient-gold">Kareler</span>
+            </h2>
+            <p className="text-theme-text-secondary leading-relaxed text-lg">
+              Tamamladığımız projelerden fotoğraf galerisi
+            </p>
+          </motion.div>
+        )}
 
-        {/* Keen Slider Carousel */}
-        <div style={{ position: "relative" }}>
-          {/* Prev Arrow */}
-          <button
-            onClick={() => instanceRef.current?.prev()}
-            className="hidden md:flex glass text-white hover:text-[#d5b36b] hover:bg-white/10 transition-all duration-300"
-            style={{
-              position: "absolute",
-              left: "-1.5rem",
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 20,
-              width: "3rem",
-              height: "3rem",
-              borderRadius: "50%",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              cursor: "pointer",
-            }}
-            aria-label="Önceki"
-          >
-            <ChevronLeft style={{ width: "1.5rem", height: "1.5rem" }} />
-          </button>
+        {/* Grid Layout */}
+        {variant === "grid" && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+            {galleryItems.map((item, index) => (
+              <motion.div
+                key={item.src}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.03 }}
+                className="group cursor-pointer overflow-hidden rounded-xl relative"
+                onClick={() => openLightbox(index)}
+              >
+                <div className="relative aspect-square overflow-hidden">
+                  <Image
+                    src={item.src}
+                    alt={item.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                  />
+                  {/* Hover Overlay */}
+                  <div
+                    className="absolute inset-0 flex flex-col justify-end p-3.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    style={{
+                      background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-xs text-white">
+                        {item.title}
+                      </span>
+                      <ZoomIn className="size-[1.125rem] text-primary-gold shrink-0" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
-          {/* Next Arrow */}
-          <button
-            onClick={() => instanceRef.current?.next()}
-            className="hidden md:flex glass text-white hover:text-[#d5b36b] hover:bg-white/10 transition-all duration-300"
-            style={{
-              position: "absolute",
-              right: "-1.5rem",
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 20,
-              width: "3rem",
-              height: "3rem",
-              borderRadius: "50%",
-              alignItems: "center",
-              justifyContent: "center",
-              border: "none",
-              cursor: "pointer",
-            }}
-            aria-label="Sonraki"
-          >
-            <ChevronRight style={{ width: "1.5rem", height: "1.5rem" }} />
-          </button>
+        {/* Slider Layout */}
+        {variant === "slider" && (
+          <div className="relative">
+            {/* Prev Arrow */}
+            <button
+              onClick={() => instanceRef.current?.prev()}
+              className="hidden md:flex glass text-white hover:text-primary-gold hover:bg-white/10 transition-all duration-300 absolute -left-6 top-1/2 -translate-y-1/2 z-20 size-12 rounded-full items-center justify-center"
+              aria-label="Önceki"
+            >
+              <ChevronLeft className="size-6" />
+            </button>
 
-          {/* Slider */}
-          <div ref={sliderRef} className="keen-slider">
-            {slides.map((item, index) => (
-              <div key={`${item.src}-${index}`} className="keen-slider__slide">
-                <div
-                  className="group cursor-pointer overflow-hidden"
-                  style={{ borderRadius: "0.75rem", position: "relative" }}
-                  onClick={() => openLightbox(index)}
-                >
-                  <div style={{ position: "relative", aspectRatio: "1/1", overflow: "hidden" }}>
-                    <Image
-                      src={item.src}
-                      alt={item.title}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
-                    />
-                    {/* Hover Overlay */}
-                    <div
-                      className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "flex-end",
-                        padding: "0.875rem",
-                      }}
-                    >
+            {/* Next Arrow */}
+            <button
+              onClick={() => instanceRef.current?.next()}
+              className="hidden md:flex glass text-white hover:text-primary-gold hover:bg-white/10 transition-all duration-300 absolute -right-6 top-1/2 -translate-y-1/2 z-20 size-12 rounded-full items-center justify-center"
+              aria-label="Sonraki"
+            >
+              <ChevronRight className="size-6" />
+            </button>
+
+            {/* Slider */}
+            <div ref={sliderRef} className="keen-slider">
+              {slides.map((item, index) => (
+                <div key={`${item.src}-${index}`} className="keen-slider__slide">
+                  <div
+                    className="group cursor-pointer overflow-hidden rounded-xl relative"
+                    onClick={() => openLightbox(index)}
+                  >
+                    <div className="relative aspect-square overflow-hidden">
+                      <Image
+                        src={item.src}
+                        alt={item.title}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                      />
+                      {/* Hover Overlay */}
                       <div
+                        className="absolute inset-0 flex flex-col justify-end p-3.5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
+                          background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
                         }}
                       >
-                        <span
-                          className="font-semibold"
-                          style={{ fontSize: "0.8rem", color: "#ffffff" }}
-                        >
-                          {item.title}
-                        </span>
-                        <ZoomIn style={{ width: "1.125rem", height: "1.125rem", color: "#d5b36b", flexShrink: 0 }} />
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-xs text-white">
+                            {item.title}
+                          </span>
+                          <ZoomIn className="size-[1.125rem] text-primary-gold shrink-0" />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Lightbox */}
       <AnimatePresence>
         {lightboxOpen && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 100000,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <div className="fixed inset-0 z-[100000] flex items-center justify-center">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -233,89 +210,34 @@ export default function Gallery() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               onClick={closeLightbox}
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: "rgba(0, 0, 0, 0.9)",
-                backdropFilter: "blur(8px)",
-              }}
+              className="absolute inset-0 bg-black/90 backdrop-blur"
             />
 
             {/* Close Button */}
             <button
               onClick={closeLightbox}
-              style={{
-                position: "absolute",
-                top: "1rem",
-                right: "1rem",
-                zIndex: 20,
-                background: "rgba(255, 255, 255, 0.1)",
-                border: "none",
-                borderRadius: "50%",
-                width: "3rem",
-                height: "3rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "white",
-              }}
-              className="hover:bg-white/20 transition-colors duration-300"
+              className="absolute top-4 right-4 z-20 bg-white/10 rounded-full size-12 flex items-center justify-center cursor-pointer text-white hover:bg-white/20 transition-colors duration-300"
               aria-label="Kapat"
             >
-              <X style={{ width: "1.5rem", height: "1.5rem" }} />
+              <X className="size-6" />
             </button>
 
             {/* Prev Arrow */}
             <button
               onClick={goPrev}
-              style={{
-                position: "absolute",
-                left: "0.75rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 20,
-                background: "rgba(255, 255, 255, 0.1)",
-                border: "none",
-                borderRadius: "50%",
-                width: "3rem",
-                height: "3rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "white",
-              }}
-              className="hover:bg-white/20 transition-colors duration-300"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/10 rounded-full size-12 flex items-center justify-center cursor-pointer text-white hover:bg-white/20 transition-colors duration-300"
               aria-label="Önceki"
             >
-              <ChevronLeft style={{ width: "1.5rem", height: "1.5rem" }} />
+              <ChevronLeft className="size-6" />
             </button>
 
             {/* Next Arrow */}
             <button
               onClick={goNext}
-              style={{
-                position: "absolute",
-                right: "0.75rem",
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 20,
-                background: "rgba(255, 255, 255, 0.1)",
-                border: "none",
-                borderRadius: "50%",
-                width: "3rem",
-                height: "3rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "white",
-              }}
-              className="hover:bg-white/20 transition-colors duration-300"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/10 rounded-full size-12 flex items-center justify-center cursor-pointer text-white hover:bg-white/20 transition-colors duration-300"
               aria-label="Sonraki"
             >
-              <ChevronRight style={{ width: "1.5rem", height: "1.5rem" }} />
+              <ChevronRight className="size-6" />
             </button>
 
             {/* Image */}
@@ -325,45 +247,26 @@ export default function Gallery() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.3 }}
-              style={{
-                position: "relative",
-                zIndex: 10,
-                maxWidth: "90vw",
-                maxHeight: "85vh",
-                width: "auto",
-                height: "auto",
-              }}
+              className="relative z-10 max-w-[90vw] max-h-[85vh] w-auto h-auto"
             >
               <Image
                 src={galleryItems[activeIndex].src}
                 alt={galleryItems[activeIndex].title}
                 width={1200}
                 height={1200}
-                className="object-contain"
-                style={{
-                  maxWidth: "90vw",
-                  maxHeight: "85vh",
-                  width: "auto",
-                  height: "auto",
-                  borderRadius: "0.75rem",
-                }}
+                className="object-contain max-w-[90vw] max-h-[85vh] w-auto h-auto rounded-xl"
               />
               {/* Title Bar */}
               <div
+                className="absolute bottom-0 inset-x-0 px-5 py-4 rounded-b-xl"
                 style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: "1rem 1.25rem",
                   background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)",
-                  borderRadius: "0 0 0.75rem 0.75rem",
                 }}
               >
-                <p className="font-semibold" style={{ color: "#ffffff", fontSize: "1rem" }}>
+                <p className="font-semibold text-white text-base">
                   {galleryItems[activeIndex].title}
                 </p>
-                <p style={{ color: "#d5b36b", fontSize: "0.875rem" }}>
+                <p className="text-primary-gold text-sm">
                   {activeIndex + 1} / {galleryItems.length}
                 </p>
               </div>
