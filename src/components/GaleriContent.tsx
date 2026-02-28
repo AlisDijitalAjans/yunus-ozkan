@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, ZoomIn, MessageCircle, Camera, FolderOpen, ImageIcon } from "lucide-react";
+import type { SiteSettings } from "@/lib/settings";
 
 const categories = [
   { id: "all", label: "Tümü" },
@@ -33,10 +34,10 @@ const galleryItems = [
 const stats = [
   { icon: Camera, value: "13+", label: "Proje Fotoğrafı" },
   { icon: FolderOpen, value: "5", label: "Kategori" },
-  { icon: ImageIcon, value: "500+", label: "Tamamlanan Proje" },
+  { icon: ImageIcon, value: "A+", label: "Kalite Standartı" },
 ];
 
-export default function GaleriContent() {
+export default function GaleriContent({ settings }: { settings: SiteSettings }) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -80,7 +81,7 @@ export default function GaleriContent() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass rounded-2xl p-5 text-center border border-transparent hover:border-primary-gold/30 transition-all duration-300"
+                  className="glass rounded-2xl p-5 text-center border border-transparent hover:border-primary-gold/30 transition-[border-color] duration-300"
                 >
                   <div className="gold-gradient size-10 rounded-xl flex items-center justify-center mx-auto mb-3">
                     <Icon className="text-black size-5" />
@@ -194,7 +195,7 @@ export default function GaleriContent() {
                 Profesyonel ekibimizle projelerinizi hayata geçiriyoruz.
               </p>
               <a
-                href="https://wa.me/905337711182"
+                href={`https://wa.me/${settings.phoneRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary inline-flex items-center gap-2.5"

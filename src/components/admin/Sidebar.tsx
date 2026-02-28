@@ -13,6 +13,8 @@ import {
   LogOut,
   User,
   X,
+  Settings,
+  Shield,
 } from "lucide-react";
 
 const navItems = [
@@ -36,6 +38,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
     if (href === "/admin") return pathname === "/admin";
     return pathname.startsWith(href);
   };
+
+  // License: 365-day countdown from a fixed start date
+  const licenseStart = new Date("2026-02-28");
+  const licenseEnd = new Date(licenseStart);
+  licenseEnd.setDate(licenseEnd.getDate() + 365);
+  const now = new Date();
+  const totalDays = 365;
+  const msLeft = licenseEnd.getTime() - now.getTime();
+  const daysLeft = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
+  const progressPct = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
 
   return (
     <>
@@ -91,7 +103,52 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               {item.label}
             </Link>
           ))}
+
+          {/* Divider */}
+          <div className="!my-3 border-t border-white/[0.06]" />
+
+          {/* Settings */}
+          <Link
+            href="/admin/ayarlar"
+            onClick={onClose}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              isActive("/admin/ayarlar")
+                ? "bg-primary-gold/10 text-primary-gold border border-primary-gold/20"
+                : "text-white/50 hover:text-white hover:bg-white/[0.04] border border-transparent"
+            }`}
+          >
+            <Settings className="size-[18px]" />
+            Ayarlar
+          </Link>
         </nav>
+
+        {/* License / Subscription */}
+        <div className="px-4 py-3 border-t border-white/[0.06]">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="flex items-center gap-1.5 text-white/70 text-[11px] font-semibold uppercase tracking-wider">
+              <Shield className="size-3.5 text-primary-gold" />
+              Lisans
+            </span>
+            <span className="text-white text-xs font-medium">
+              {daysLeft} gün kaldı
+            </span>
+          </div>
+          {/* Progress Bar */}
+          <div className="w-full h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${progressPct}%`,
+                background:
+                  daysLeft > 90
+                    ? "linear-gradient(90deg, #d5b36b, #c9a961)"
+                    : daysLeft > 30
+                      ? "linear-gradient(90deg, #f59e0b, #d97706)"
+                      : "linear-gradient(90deg, #ef4444, #dc2626)",
+              }}
+            />
+          </div>
+        </div>
 
         {/* User + Logout */}
         <div className="px-4 py-4 border-t border-white/[0.06]">

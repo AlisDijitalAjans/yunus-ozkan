@@ -9,6 +9,7 @@ import {
   Instagram,
   Twitter,
 } from "lucide-react";
+import type { SiteSettings } from "@/lib/settings";
 
 const quickLinks = [
   { href: "#hakkimizda", label: "Hakkımızda" },
@@ -24,7 +25,7 @@ const services = [
   "Toprak Taşıma",
 ];
 
-export default function Footer() {
+export default function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer className="relative overflow-hidden">
       {/* Gold Line */}
@@ -104,7 +105,7 @@ export default function Footer() {
                 {/* Phone */}
                 <li>
                   <a
-                    href="https://wa.me/905337711182"
+                    href={`https://wa.me/${settings.phoneRaw}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-start text-theme-text-secondary hover:text-primary-gold transition-colors duration-300 gap-3"
@@ -112,7 +113,7 @@ export default function Footer() {
                     <Phone className="text-primary-gold shrink-0 size-6" />
                     <div className="text-left">
                       <p className="font-semibold text-base">Telefon</p>
-                      <p className="text-base">0533 771 11 82</p>
+                      <p className="text-base">{settings.phone}</p>
                     </div>
                   </a>
                 </li>
@@ -120,7 +121,7 @@ export default function Footer() {
                 {/* WhatsApp */}
                 <li>
                   <a
-                    href="https://wa.me/905337711182"
+                    href={`https://wa.me/${settings.phoneRaw}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-start text-theme-text-secondary hover:text-primary-gold transition-colors duration-300 gap-3"
@@ -173,7 +174,7 @@ export default function Footer() {
                 Profesyonel ekibimizle projelerinizi hayata geçiriyoruz.
               </p>
               <a
-                href="https://wa.me/905337711182"
+                href={`https://wa.me/${settings.phoneRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary inline-flex items-center gap-2.5"

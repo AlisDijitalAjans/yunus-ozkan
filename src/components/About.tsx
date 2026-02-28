@@ -5,10 +5,10 @@ import { motion } from "framer-motion";
 import { Check, FileText, Truck, Droplets } from "lucide-react";
 
 const statsData = [
-  { value: "500+", label: "Tamamlanan Proje" },
-  { value: "%98", label: "Müşteri Memnuniyeti" },
-  { value: "7/12", label: "Destek Hattı" },
   { value: "A+", label: "Kalite Standartı" },
+  { value: "%100", label: "Müşteri Memnuniyeti" },
+  { value: "7/24", label: "Destek Hattı" },
+  { value: "Kayseri", label: "Hizmet Bölgesi" },
 ];
 
 const featuresList = [
@@ -155,7 +155,7 @@ export default function About({ showHeader = true }: AboutProps) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="glass hover:bg-white/10 transition-all duration-500 group relative overflow-hidden border border-transparent hover:border-primary-gold/50 rounded-2xl p-7"
+                className="glass hover:bg-white/10 transition-[border-color,background-color] duration-500 group relative overflow-hidden border border-transparent hover:border-primary-gold/50 rounded-2xl p-7"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#d5b36b]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">

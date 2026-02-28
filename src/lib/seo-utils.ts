@@ -40,6 +40,23 @@ export function extractHeadings(html: string): string[] {
   return headings;
 }
 
+/** Türkçe karakterleri ASCII'ye dönüştür (slug karşılaştırması için) */
+export function turkishToAscii(str: string): string {
+  return str
+    .replace(/ı/g, "i")
+    .replace(/İ/g, "i")
+    .replace(/ö/g, "o")
+    .replace(/Ö/g, "o")
+    .replace(/ü/g, "u")
+    .replace(/Ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/Ş/g, "s")
+    .replace(/ç/g, "c")
+    .replace(/Ç/g, "c")
+    .replace(/ğ/g, "g")
+    .replace(/Ğ/g, "g");
+}
+
 const TURKISH_STOP_WORDS = new Set([
   // Türkçe
   "bir", "ve", "bu", "da", "de", "ile", "için", "olan", "den", "dan",
@@ -131,9 +148,10 @@ export function analyzeSeo(params: {
     weight: 10,
   });
 
-  // 4. Keyword in slug (10 pts)
-  const slugKeyword = keyword.replace(/\s+/g, "-");
-  const slugHas = seo.slug.toLowerCase().includes(slugKeyword);
+  // 4. Keyword in slug (10 pts) — Türkçe karakterler ASCII'ye dönüştürülüp karşılaştırılır
+  const slugKeyword = turkishToAscii(keyword).replace(/\s+/g, "-");
+  const slugNormalized = turkishToAscii(seo.slug.toLowerCase());
+  const slugHas = slugNormalized.includes(slugKeyword);
   checks.push({
     label: "URL (slug) anahtar kelime içeriyor",
     passed: slugHas,

@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import HakkimizdaContent from "@/components/HakkimizdaContent";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Hakkımızda | Yunus Özkan İnşaat",
-  description: "Yunus Özkan İnşaat - 2015'ten beri profesyonel inşaat, hafriyat ve arazi düzenleme hizmetleri.",
+  description: "Yunus Özkan İnşaat - Profesyonel inşaat, hafriyat ve arazi düzenleme hizmetleri. Kayseri ve çevresinde güvenilir çözümler.",
 };
 
-export default function HakkimizdaPage() {
+export default async function HakkimizdaPage() {
+  const settings = await getSettings();
+
   return (
     <>
       <PageHeader
@@ -16,7 +19,7 @@ export default function HakkimizdaPage() {
         highlight="Garantili İşçilik"
         description="Profesyonel ekibimiz ve modern ekipmanlarımız ile projelerinizi baştan sona kesintisiz ve garantili bir şekilde tamamlıyoruz."
       />
-      <HakkimizdaContent />
+      <HakkimizdaContent settings={settings} />
     </>
   );
 }

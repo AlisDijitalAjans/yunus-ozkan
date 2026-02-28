@@ -23,9 +23,9 @@
   // Common list styles
   ol,
   ul {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-    padding-left: 1.5em;
+    margin-top: 0.6em;
+    margin-bottom: 0.6em;
+    padding-left: 1.75em;
 
     &:first-child {
       margin-top: 0;
@@ -37,15 +37,23 @@
 
     ol,
     ul {
-      margin-top: 0;
-      margin-bottom: 0;
+      margin-top: 0.25em;
+      margin-bottom: 0.25em;
     }
   }
 
   li {
+    padding-top: 0.15em;
+    padding-bottom: 0.15em;
+    line-height: 1.7;
+
     p {
       margin-top: 0;
-      line-height: 1.4;
+      line-height: 1.7;
+    }
+
+    &::marker {
+      color: #94a3b8;
     }
   }
 

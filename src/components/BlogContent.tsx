@@ -4,21 +4,32 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight } from "lucide-react";
-import { blogPosts } from "@/data/blogPosts";
+interface BlogListItem {
+  slug: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  date: string;
+  category: string;
+}
 
-export default function BlogContent() {
+interface BlogContentProps {
+  posts: BlogListItem[];
+}
+
+export default function BlogContent({ posts }: BlogContentProps) {
   return (
     <section className="section-padding pt-0">
       <div className="container-custom">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {blogPosts.map((post, index) => (
+          {posts.map((post, index) => (
             <Link key={post.slug} href={`/blog/${post.slug}`}>
             <motion.article
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
-              className="glass group overflow-hidden border border-transparent hover:border-primary-gold/50 transition-all duration-500 cursor-pointer rounded-2xl h-full"
+              className="glass group overflow-hidden border border-transparent hover:border-primary-gold/50 transition-[border-color] duration-500 cursor-pointer rounded-2xl h-full"
             >
               {/* Image */}
               <div className="relative overflow-hidden aspect-[16/10]">

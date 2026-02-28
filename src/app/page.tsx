@@ -3,11 +3,14 @@ import About from "@/components/About";
 import Projects from "@/components/Projects";
 import Services from "@/components/Services";
 import Gallery from "@/components/Gallery";
+import { getSettings } from "@/lib/settings";
 
-export default function Home() {
+export default async function Home() {
+  const settings = await getSettings();
+
   return (
     <>
-      <Hero />
+      <Hero settings={settings} />
       <About />
       <Projects />
       <Services />

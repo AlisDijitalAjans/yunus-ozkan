@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Sidebar from "@/components/admin/Sidebar";
 import Topbar from "@/components/admin/Topbar";
+import { ToastProvider } from "@/components/admin/Toast";
 
 function DashboardGuard({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
@@ -37,7 +38,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
     <DashboardGuard>
       <div className="min-h-screen bg-[#0d0d0d]">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <div className="lg:ml-[260px] min-h-screen bg-[#f5f3ef]">
+        <div className="lg:ml-[260px] min-h-screen bg-[#faf9f7]">
           {/* Mobile-only topbar */}
           <div className="lg:hidden sticky top-0 z-30 h-14 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 flex items-center px-5">
             <button
@@ -61,7 +62,9 @@ export default function DashboardLayout({
 }) {
   return (
     <SessionProvider>
-      <DashboardShell>{children}</DashboardShell>
+      <ToastProvider>
+        <DashboardShell>{children}</DashboardShell>
+      </ToastProvider>
     </SessionProvider>
   );
 }

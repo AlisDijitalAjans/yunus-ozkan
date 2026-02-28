@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, MessageCircle, ChevronRight, Play, Eye } from "lucide-react";
+import { useRef, useCallback, useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { MessageCircle, MapPin, ArrowRight } from "lucide-react";
+import type { SiteSettings } from "@/lib/settings";
 
 const projects = [
   {
@@ -58,13 +60,13 @@ function VolumeOffIcon() {
   );
 }
 
-export default function ProjelerContent() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [activeProject, setActiveProject] = useState<(typeof projects)[0] | null>(null);
+export default function ProjelerContent({ settings }: { settings: SiteSettings }) {
   const [mutedStates, setMutedStates] = useState<boolean[]>(projects.map(() => true));
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  const toggleMute = useCallback((index: number) => {
+  const toggleMute = useCallback((index: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setMutedStates((prev) => {
       const next = [...prev];
       next[index] = !next[index];
@@ -74,125 +76,70 @@ export default function ProjelerContent() {
     if (video) video.muted = !video.muted;
   }, []);
 
-  const openModal = (project: (typeof projects)[0]) => {
-    setActiveProject(project);
-    setModalOpen(true);
-    document.body.style.overflow = "hidden";
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setActiveProject(null);
-    document.body.style.overflow = "";
-  };
-
   return (
     <>
-      {/* Stats Bar */}
-      <section className="section-padding pt-0 pb-8">
-        <div className="container-custom">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {[
-              { value: "4+", label: "Aktif Proje" },
-              { value: "500+", label: "Tamamlanan Proje" },
-              { value: "10+", label: "Yıllık Tecrübe" },
-              { value: "%100", label: "Zamanında Teslimat" },
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="glass rounded-2xl p-5 text-center border border-transparent hover:border-primary-gold/30 transition-all duration-300"
-              >
-                <div className="font-bold text-gradient-gold text-fluid-stat-lg mb-1">{stat.value}</div>
-                <p className="text-theme-text-secondary font-medium text-sm">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Projects Grid */}
       <section className="section-padding pt-0">
         <div className="container-custom">
-          <div className="flex flex-col gap-8">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {projects.map((project, index) => (
               <motion.div
                 key={project.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="glass rounded-3xl overflow-hidden border border-transparent hover:border-primary-gold/30 transition-all duration-500"
+                transition={{ duration: 0.5, delay: index * 0.05 }}
               >
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-0 ${
-                  index % 2 === 1 ? "md:[direction:rtl]" : ""
-                }`}>
-                  {/* Video */}
-                  <div
-                    className="relative aspect-[5/4] overflow-hidden md:[direction:ltr] cursor-pointer"
-                    onClick={() => openModal(project)}
-                  >
-                    <video
-                      ref={(el) => { videoRefs.current[index] = el; }}
-                      src={project.video}
-                      muted
-                      autoPlay
-                      loop
-                      playsInline
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Sound Toggle */}
-                    <button
-                      onClick={() => toggleMute(index)}
-                      className="glass hover:bg-white/20 transition-all duration-300 absolute top-3 right-3 z-10 size-10 rounded-full flex items-center justify-center text-white cursor-pointer"
-                      aria-label={mutedStates[index] ? "Sesi Aç" : "Sesi Kapat"}
-                    >
-                      {mutedStates[index] ? <VolumeOffIcon /> : <VolumeOnIcon />}
-                    </button>
-                    {/* Category Badge */}
-                    <div className="absolute top-3 left-3 z-10">
-                      <span className="glass text-primary-gold text-xs font-semibold py-1 px-3 rounded-full">
-                        {project.category}
+                <Link href={`/projeler/${index + 1}`} className="block h-full">
+                  <article className="glass group rounded-2xl overflow-hidden border border-transparent hover:border-primary-gold/50 transition-[border-color] duration-500 h-full flex flex-col">
+                    {/* Video */}
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <video
+                        ref={(el) => { videoRefs.current[index] = el; }}
+                        src={project.video}
+                        muted
+                        autoPlay
+                        loop
+                        playsInline
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      {/* Sound Toggle */}
+                      <button
+                        onClick={(e) => toggleMute(index, e)}
+                        className="glass hover:bg-white/20 transition-all duration-300 absolute top-3 right-3 z-10 size-9 rounded-full flex items-center justify-center text-white cursor-pointer"
+                        aria-label={mutedStates[index] ? "Sesi Aç" : "Sesi Kapat"}
+                      >
+                        {mutedStates[index] ? <VolumeOffIcon /> : <VolumeOnIcon />}
+                      </button>
+                      {/* Category Badge */}
+                      <div className="absolute top-3 left-3 z-10">
+                        <span className="glass text-primary-gold text-xs font-semibold py-1 px-3 rounded-full">
+                          {project.category}
+                        </span>
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5 flex flex-col flex-1">
+                      <div className="flex items-center gap-1.5 text-theme-text-muted text-sm mb-2">
+                        <MapPin className="size-3.5" />
+                        <span>{project.location}</span>
+                      </div>
+                      <h3 className="font-bold text-theme-text text-lg group-hover:text-primary-gold transition-colors duration-300 mb-2">
+                        {project.title}
+                      </h3>
+                      <p className="text-theme-text-muted text-sm leading-relaxed mb-5 line-clamp-3 flex-1">
+                        {project.description}
+                      </p>
+
+                      <span className="text-primary-gold font-semibold text-sm inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all duration-300">
+                        Detayları Gör
+                        <ArrowRight className="size-4" />
                       </span>
                     </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6 md:p-8 flex flex-col justify-center md:[direction:ltr]">
-                    <div className="flex items-center gap-2 text-theme-text-muted text-sm mb-3">
-                      <Eye className="size-4" />
-                      <span>{project.location}</span>
-                    </div>
-                    <h3 className="font-bold text-theme-text text-fluid-subsection mb-4">
-                      {project.title}
-                    </h3>
-                    <p className="text-theme-text-secondary leading-relaxed text-base mb-6">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        onClick={() => openModal(project)}
-                        className="btn-primary inline-flex items-center gap-1.5 text-sm"
-                        style={{ padding: "0.5rem 1rem" }}
-                      >
-                        <span>Detayları Gör</span>
-                        <ChevronRight className="size-4" />
-                      </button>
-                      <a
-                        href="https://wa.me/905337711182"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-primary-gold font-semibold text-sm hover:underline"
-                      >
-                        <MessageCircle className="size-4" />
-                        <span>Teklif Al</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
+                  </article>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -213,7 +160,7 @@ export default function ProjelerContent() {
                 Profesyonel ekibimizle projelerinizi hayata geçiriyoruz.
               </p>
               <a
-                href="https://wa.me/905337711182"
+                href={`https://wa.me/${settings.phoneRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary inline-flex items-center gap-2.5"
@@ -225,79 +172,6 @@ export default function ProjelerContent() {
           </div>
         </div>
       </section>
-
-      {/* Detail Modal — 2 column: video + description */}
-      <AnimatePresence>
-        {modalOpen && activeProject && (
-          <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={closeModal}
-              className="absolute inset-0 bg-black/80 backdrop-blur"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="glass relative z-10 max-w-4xl w-full rounded-3xl overflow-hidden border border-primary-gold/30"
-            >
-              <button
-                onClick={closeModal}
-                className="text-white/70 hover:text-white transition-colors duration-300 absolute top-4 right-4 z-20"
-                aria-label="Kapat"
-              >
-                <X className="size-6" />
-              </button>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                {/* Video */}
-                <div className="relative aspect-[5/4] md:aspect-auto md:min-h-[360px] overflow-hidden">
-                  <video
-                    src={activeProject.video}
-                    muted
-                    autoPlay
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3 z-10">
-                    <span className="glass text-primary-gold text-xs font-semibold py-1 px-3 rounded-full">
-                      {activeProject.category}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 md:p-8 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 text-theme-text-muted text-sm mb-3">
-                    <Eye className="size-4" />
-                    <span>{activeProject.location}</span>
-                  </div>
-                  <h3 className="font-bold text-theme-text text-2xl mb-4">
-                    {activeProject.title}
-                  </h3>
-                  <p className="text-theme-text-secondary leading-relaxed text-base mb-7">
-                    {activeProject.description}
-                  </p>
-                  <a
-                    href="https://wa.me/905337711182"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary inline-flex items-center gap-2 w-fit"
-                  >
-                    <MessageCircle className="size-5" />
-                    <span>Teklif Al</span>
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

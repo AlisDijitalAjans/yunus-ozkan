@@ -3,16 +3,52 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Plus, Trash2, Search, X } from "lucide-react";
+import { Plus, Trash2, Search, X, ImageIcon, FolderOpen, Eye, HardDrive } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { galleryItems, galleryCategories } from "@/data/gallery";
 import CloudinaryUpload from "@/components/admin/CloudinaryUpload";
+import StatsCard from "@/components/admin/StatsCard";
+import { useToast } from "@/components/admin/Toast";
+
+const galeriStats = [
+  {
+    icon: ImageIcon,
+    label: "Toplam Görsel",
+    value: galleryItems.length,
+    trend: "+3 bu ay",
+    color: "emerald",
+    chartData: [{ v: 5 }, { v: 8 }, { v: 10 }, { v: 12 }, { v: 14 }, { v: 16 }, { v: galleryItems.length }],
+  },
+  {
+    icon: FolderOpen,
+    label: "Kategori",
+    value: galleryCategories.length - 1,
+    color: "blue",
+    chartData: [{ v: 2 }, { v: 3 }, { v: 3 }, { v: 4 }, { v: 4 }, { v: 5 }, { v: galleryCategories.length - 1 }],
+  },
+  {
+    icon: Eye,
+    label: "Görüntülenme",
+    value: "856",
+    trend: "+12%",
+    color: "amber",
+    chartData: [{ v: 300 }, { v: 400 }, { v: 450 }, { v: 550 }, { v: 680 }, { v: 780 }, { v: 856 }],
+  },
+  {
+    icon: HardDrive,
+    label: "Depolama",
+    value: "48 MB",
+    color: "violet",
+    chartData: [{ v: 10 }, { v: 15 }, { v: 22 }, { v: 28 }, { v: 35 }, { v: 42 }, { v: 48 }],
+  },
+];
 
 export default function AdminGaleriPage() {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("tumu");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [uploadUrl, setUploadUrl] = useState("");
+  const { toast } = useToast();
 
   const filtered = galleryItems.filter((item) => {
     const matchSearch = item.title
@@ -25,6 +61,13 @@ export default function AdminGaleriPage() {
 
   return (
     <div className="space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {galeriStats.map((s) => (
+          <StatsCard key={s.label} {...s} />
+        ))}
+      </div>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -35,9 +78,9 @@ export default function AdminGaleriPage() {
         </div>
         <button
           onClick={() => setUploadOpen(true)}
-          className="btn-primary inline-flex items-center gap-2 text-sm shrink-0 self-start"
+          className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition-colors shrink-0 self-start cursor-pointer"
         >
-          <Plus className="size-4" />
+          <Plus className="size-3.5" />
           Görsel Ekle
         </button>
       </div>
@@ -84,7 +127,7 @@ export default function AdminGaleriPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: i * 0.02 }}
-            className="group relative aspect-square rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm hover:border-primary-gold/30 hover:shadow-md transition-all duration-300"
+            className="group relative aspect-square rounded-xl overflow-hidden bg-white border border-gray-100 hover:border-primary-gold/30 transition-all duration-300"
           >
             <Image
               src={item.src}
@@ -105,7 +148,7 @@ export default function AdminGaleriPage() {
                   }
                 </span>
                 <button
-                  onClick={() => alert(`Silme: ${item.title}`)}
+                  onClick={() => toast(`"${item.title}" silindi.`, "success")}
                   className="p-1 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-300 transition-colors"
                 >
                   <Trash2 className="size-3" />
@@ -167,11 +210,11 @@ export default function AdminGaleriPage() {
               {uploadUrl && (
                 <button
                   onClick={() => {
-                    alert(`Görsel yüklendi: ${uploadUrl}`);
+                    toast("Görsel başarıyla yüklendi.", "success");
                     setUploadOpen(false);
                     setUploadUrl("");
                   }}
-                  className="btn-primary w-full flex items-center justify-center gap-2 text-sm mt-4"
+                  className="w-full flex items-center justify-center gap-2 h-8 px-3 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition-colors mt-4 cursor-pointer"
                 >
                   Kaydet
                 </button>

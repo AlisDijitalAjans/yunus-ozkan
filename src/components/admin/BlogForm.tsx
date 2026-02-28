@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, X, ChevronDown, ChevronUp } from "lucide-react";
@@ -8,6 +8,8 @@ import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor
 import CloudinaryUpload from "@/components/admin/CloudinaryUpload";
 import EditorLayout from "@/components/admin/EditorLayout";
 import { type SeoData } from "@/components/admin/FormSidebar";
+import { useToast } from "@/components/admin/Toast";
+import { analyzeSeo } from "@/lib/seo-utils";
 
 interface FaqItem {
   question: string;
@@ -16,12 +18,17 @@ interface FaqItem {
 
 interface BlogFormProps {
   initialData?: {
+    slug?: string;
     title: string;
     excerpt: string;
     category: string;
     image: string;
     content: string;
     faqs?: FaqItem[];
+    focusKeyword?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    seoSlug?: string;
   };
   isEdit?: boolean;
 }
@@ -36,6 +43,7 @@ const categories = [
 
 export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [title, setTitle] = useState(initialData?.title || "");
   const [excerpt, setExcerpt] = useState(initialData?.excerpt || "");
   const [category, setCategory] = useState(initialData?.category || categories[0]);
@@ -44,17 +52,72 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
   const [faqs, setFaqs] = useState<FaqItem[]>(
     initialData?.faqs || []
   );
-  const [focusKeyword, setFocusKeyword] = useState("");
+  const [focusKeyword, setFocusKeyword] = useState(initialData?.focusKeyword || "");
   const [status, setStatus] = useState<"draft" | "published">(
     isEdit ? "published" : "draft"
   );
   const [seo, setSeo] = useState<SeoData>({
-    metaTitle: initialData?.title || "",
-    metaDescription: initialData?.excerpt || "",
-    slug: "",
+    metaTitle: initialData?.metaTitle || initialData?.title || "",
+    metaDescription: initialData?.metaDescription || initialData?.excerpt || "",
+    slug: initialData?.seoSlug || initialData?.slug || "",
   });
+  const [saving, setSaving] = useState(false);
   const handleSeoChange = (field: keyof SeoData, value: string) =>
     setSeo((prev) => ({ ...prev, [field]: value }));
+
+  // AI verisini form render'dan ÖNCE yükle (SimpleEditor content'i sadece mount'ta okuyor)
+  const [ready, setReady] = useState(!!isEdit);
+  const [imageGenerating, setImageGenerating] = useState(false);
+  const [seoOptimizing, setSeoOptimizing] = useState(false);
+  useEffect(() => {
+    const stored = sessionStorage.getItem("ai-generated-blog");
+    if (stored) {
+      sessionStorage.removeItem("ai-generated-blog");
+      try {
+        const data = JSON.parse(stored);
+        if (data.title) setTitle(data.title);
+        if (data.excerpt) setExcerpt(data.excerpt);
+        if (data.category && categories.includes(data.category)) setCategory(data.category);
+        if (data.content) setContent(data.content);
+        if (data.faqs?.length) setFaqs(data.faqs);
+        if (data.focusKeyword) setFocusKeyword(data.focusKeyword);
+        if (data.image) {
+          setImage(data.image);
+        }
+        setSeo({
+          metaTitle: data.metaTitle || data.title || "",
+          metaDescription: data.metaDescription || data.excerpt || "",
+          slug: data.slug || "",
+        });
+        toast("AI içerik başarıyla oluşturuldu!", "success");
+
+        // Görsel yoksa otomatik üret
+        if (!data.image && data.title) {
+          setImageGenerating(true);
+          fetch("/api/ai/image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: data.title, entityType: "blog", folder: "blog" }),
+          })
+            .then((res) => res.json())
+            .then((imgData) => {
+              if (imgData.url) {
+                setImage(imgData.url);
+                toast("AI kapak görseli oluşturuldu!", "success");
+              } else {
+                toast("AI görsel oluşturulamadı. Manuel olarak ekleyebilirsiniz.", "error");
+              }
+            })
+            .catch(() => toast("AI görsel oluşturulurken hata oluştu.", "error"))
+            .finally(() => setImageGenerating(false));
+        }
+      } catch {
+        // JSON parse hatası — sessizce geç
+      }
+    }
+    setReady(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const addFaq = () => setFaqs([...faqs, { question: "", answer: "" }]);
   const removeFaq = (i: number) => setFaqs(faqs.filter((_, idx) => idx !== i));
@@ -68,20 +131,186 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
     setFaqs(next);
   };
 
-  const handleSaveDraft = () => {
-    setStatus("draft");
-    alert("Taslak olarak kaydedildi!");
+  const buildPayload = (targetStatus: "draft" | "published") => ({
+    slug: seo.slug || title.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-"),
+    title,
+    excerpt,
+    image,
+    date: new Date().toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" }),
+    category,
+    readingTime: `${Math.max(1, Math.ceil(content.replace(/<[^>]*>/g, "").split(/\s+/).length / 200))} dk okuma`,
+    author: "Yunus Özkan İnşaat Ekibi",
+    htmlContent: content,
+    faqs,
+    focusKeyword,
+    status: targetStatus,
+    metaTitle: seo.metaTitle,
+    metaDescription: seo.metaDescription,
+  });
+
+  const saveToDb = async (targetStatus: "draft" | "published") => {
+    if (!title.trim()) { toast("Başlık gerekli.", "error"); return; }
+    if (saving) return;
+    setSaving(true);
+    try {
+      const payload = buildPayload(targetStatus);
+      const isUpdate = isEdit && initialData?.slug;
+      const url = isUpdate ? `/api/blog/${initialData.slug}` : "/api/blog";
+      const method = isUpdate ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(isUpdate ? { ...payload, newSlug: payload.slug !== initialData.slug ? payload.slug : undefined } : payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Bilinmeyen hata" }));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      setStatus(targetStatus);
+      toast(
+        targetStatus === "draft"
+          ? "Taslak olarak kaydedildi."
+          : isEdit ? "Yazı güncellendi." : "Yazı yayınlandı.",
+        "success"
+      );
+      router.push("/admin/blog");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Bilinmeyen hata";
+      toast(`Kaydetme hatası: ${msg}`, "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handlePublish = () => {
-    setStatus("published");
-    alert(isEdit ? "Yazı güncellendi!" : "Yazı yayınlandı!");
-    router.push("/admin/blog");
+  const handleSaveDraft = () => saveToDb("draft");
+  const handlePublish = () => saveToDb("published");
+
+  const handleAiSeoOptimize = async () => {
+    if (!focusKeyword.trim()) {
+      toast("Önce bir odak anahtar kelime girin.", "error");
+      return;
+    }
+    if (seoOptimizing) return;
+    setSeoOptimizing(true);
+
+    let currentTitle = title;
+    let currentContent = content;
+    let currentSeo = { ...seo };
+    const MAX_ATTEMPTS = 3;
+
+    try {
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        const analysis = analyzeSeo({
+          focusKeyword,
+          title: currentTitle,
+          content: currentContent,
+          seo: currentSeo,
+          hasMedia: !!image,
+        });
+
+        if (analysis.score >= 100) {
+          toast(`SEO skoru 100! (${attempt > 1 ? `${attempt - 1} deneme ile` : "zaten"} tamamlandı)`, "success");
+          break;
+        }
+
+        const failingChecks = analysis.checks
+          .filter((c) => !c.passed)
+          .map((c) => `${c.label}${c.detail ? ` (${c.detail})` : ""}`);
+
+        toast(`Deneme ${attempt}/${MAX_ATTEMPTS} — Skor: ${analysis.score}, ${failingChecks.length} sorun düzeltiliyor...`, "info");
+
+        const res = await fetch("/api/ai/seo-optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: currentTitle,
+            content: currentContent,
+            focusKeyword,
+            metaTitle: currentSeo.metaTitle,
+            metaDescription: currentSeo.metaDescription,
+            slug: currentSeo.slug,
+            failingChecks,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: "Bilinmeyen hata" }));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        if (data.title) {
+          currentTitle = data.title;
+          setTitle(data.title);
+        }
+        if (data.content) {
+          currentContent = data.content;
+          setContent(data.content);
+        }
+        const newSeo = {
+          metaTitle: data.metaTitle || currentSeo.metaTitle,
+          metaDescription: data.metaDescription || currentSeo.metaDescription,
+          slug: data.slug || currentSeo.slug,
+        };
+        currentSeo = newSeo;
+        setSeo(newSeo);
+
+        // Final check after applying
+        const finalAnalysis = analyzeSeo({
+          focusKeyword,
+          title: currentTitle,
+          content: currentContent,
+          seo: currentSeo,
+          hasMedia: !!image,
+        });
+
+        if (finalAnalysis.score >= 100) {
+          toast(`SEO skoru 100'e ulaştı! (${attempt} deneme)`, "success");
+          break;
+        }
+
+        if (attempt === MAX_ATTEMPTS) {
+          toast(`SEO skoru ${finalAnalysis.score}'a yükseltildi. (${MAX_ATTEMPTS} deneme tamamlandı)`, "info");
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Bilinmeyen hata";
+      toast(`SEO iyileştirme hatası: ${msg}`, "error");
+    } finally {
+      setSeoOptimizing(false);
+    }
   };
 
-  const handleAiSeoOptimize = () => {
-    alert("AI SEO iyileştirme yakında aktif olacak!");
+  const handleAiImage = () => {
+    if (!title.trim()) {
+      toast("Önce bir başlık girin.", "error");
+      return;
+    }
+    if (imageGenerating) return;
+    setImageGenerating(true);
+    fetch("/api/ai/image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, entityType: "blog", folder: "blog" }),
+    })
+      .then((res) => res.json())
+      .then((imgData) => {
+        if (imgData.url) {
+          setImage(imgData.url);
+          toast("AI kapak görseli oluşturuldu!", "success");
+        } else {
+          toast(imgData.error || "Görsel oluşturulamadı.", "error");
+        }
+      })
+      .catch(() => toast("Görsel oluşturulurken hata oluştu.", "error"))
+      .finally(() => setImageGenerating(false));
   };
+
+  if (!ready) return null;
 
   return (
     <EditorLayout
@@ -106,6 +335,7 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
       postTitle={title}
       hasMedia={!!image}
       onAiSeoOptimize={handleAiSeoOptimize}
+      seoOptimizing={seoOptimizing}
       sidebarChildren={
         <>
           {/* Category */}
@@ -148,6 +378,8 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
             folder="blog"
             label="Kapak Görseli"
             maxSizeMB={10}
+            aiGenerating={imageGenerating}
+            onAiGenerate={handleAiImage}
           />
         </>
       }
@@ -157,7 +389,7 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl p-5 border border-gray-100"
       >
         <label className="block text-gray-700 text-sm font-medium mb-1.5">
           Başlık
@@ -177,13 +409,13 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.05 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl p-5 border border-gray-100"
       >
         <label className="block text-gray-700 text-sm font-medium mb-3">
           İçerik
         </label>
         <div className="rounded-xl overflow-hidden border border-gray-200">
-          <SimpleEditor content={initialData?.content} onChange={setContent} />
+          <SimpleEditor content={content} onChange={setContent} />
         </div>
       </motion.div>
 
@@ -192,7 +424,7 @@ export default function BlogForm({ initialData, isEdit }: BlogFormProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl p-5 border border-gray-100"
       >
         <div className="flex items-center justify-between mb-4">
           <div>

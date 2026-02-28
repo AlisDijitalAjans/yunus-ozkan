@@ -8,9 +8,9 @@ import { motion } from "framer-motion";
 import { Lock, Mail, LogIn, Eye, EyeOff, Building2, Award, Users } from "lucide-react";
 
 const stats = [
-  { icon: Building2, value: "500+", label: "Tamamlanan Proje" },
-  { icon: Award, value: "10+", label: "Yıllık Deneyim" },
-  { icon: Users, value: "50+", label: "Uzman Kadro" },
+  { icon: Building2, value: "A+", label: "Kalite Standartı" },
+  { icon: Award, value: "7/24", label: "Destek Hattı" },
+  { icon: Users, value: "%100", label: "Müşteri Memnuniyeti" },
 ];
 
 export default function AdminLoginPage() {
@@ -90,7 +90,7 @@ export default function AdminLoginPage() {
               <span className="text-gradient-gold">Hizmetleri</span>
             </h2>
             <p className="text-white/50 mt-4 max-w-md leading-relaxed">
-              2015&apos;ten bu yana sektörde edindiğimiz tecrübe ve güvenle
+              Sektörde edindiğimiz tecrübe ve güvenle
               projelerinizi hayata geçiriyoruz.
             </p>
           </motion.div>

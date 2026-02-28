@@ -2,7 +2,7 @@
 
 import { useMemo, useDeferredValue } from "react";
 import { motion } from "framer-motion";
-import { Target, Check, X, Sparkles } from "lucide-react";
+import { Target, Check, X, Sparkles, Loader2 } from "lucide-react";
 import {
   analyzeSeo,
   type SeoFields,
@@ -17,6 +17,7 @@ interface SeoScoreWidgetProps {
   seo: SeoFields;
   hasMedia?: boolean;
   onAiSeoOptimize?: () => void;
+  seoOptimizing?: boolean;
 }
 
 // ── Score Gauge ─────────────────────────────────────────────────────
@@ -144,6 +145,7 @@ export default function SeoScoreWidget({
   seo,
   hasMedia,
   onAiSeoOptimize,
+  seoOptimizing,
 }: SeoScoreWidgetProps) {
   const deferredContent = useDeferredValue(content);
 
@@ -166,7 +168,7 @@ export default function SeoScoreWidget({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm space-y-4"
+      className="bg-white rounded-2xl p-5 border border-gray-100 space-y-4"
     >
       {/* Header + Score Gauge */}
       <div className="flex items-center gap-2">
@@ -181,10 +183,20 @@ export default function SeoScoreWidget({
         <button
           type="button"
           onClick={onAiSeoOptimize}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-medium hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+          disabled={seoOptimizing}
+          className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-medium hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          <Sparkles className="size-4" />
-          AI ile SEO İyileştir
+          {seoOptimizing ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              SEO İyileştiriliyor...
+            </>
+          ) : (
+            <>
+              <Sparkles className="size-4" />
+              AI ile SEO İyileştir
+            </>
+          )}
         </button>
       )}
 

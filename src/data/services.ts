@@ -26,7 +26,7 @@ export const services: Service[] = [
       "Drenaj sistemi entegrasyonu",
       "Depreme dayanıklı tasarım",
     ],
-    htmlContent: `<h2>İstinat Duvarı Hizmetimiz</h2><p>Toprak kaymasını önlemek ve arazinin güvenli kullanımını sağlamak amacıyla mühendislik hesaplarına dayalı betonarme istinat duvarı sistemleri inşa ediyoruz.</p><h2>Hizmet Kapsamı</h2><ul><li>Zemin etüdü ve mühendislik analizi</li><li>Betonarme konsol ve ağırlık tipi istinat duvarı</li><li>Arka dolgu drenaj sistemi entegrasyonu</li><li>Deprem yönetmeliğine uygun tasarım</li></ul><p>10 yılı aşkın deneyimimizle Kayseri ve çevresinde onlarca başarılı istinat duvarı projesi tamamladık.</p>`,
+    htmlContent: `<h2>İstinat Duvarı Hizmetimiz</h2><p>Toprak kaymasını önlemek ve arazinin güvenli kullanımını sağlamak amacıyla mühendislik hesaplarına dayalı betonarme istinat duvarı sistemleri inşa ediyoruz.</p><h2>Hizmet Kapsamı</h2><ul><li>Zemin etüdü ve mühendislik analizi</li><li>Betonarme konsol ve ağırlık tipi istinat duvarı</li><li>Arka dolgu drenaj sistemi entegrasyonu</li><li>Deprem yönetmeliğine uygun tasarım</li></ul><p>Deneyimli ekibimiz ile Kayseri ve çevresinde onlarca başarılı istinat duvarı projesi tamamladık.</p>`,
     faqs: [
       {
         question: "İstinat duvarı hangi durumlarda gereklidir?",

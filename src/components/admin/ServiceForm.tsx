@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -13,6 +13,8 @@ import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor
 import CloudinaryUpload from "@/components/admin/CloudinaryUpload";
 import EditorLayout from "@/components/admin/EditorLayout";
 import { type SeoData } from "@/components/admin/FormSidebar";
+import { useToast } from "@/components/admin/Toast";
+import { analyzeSeo } from "@/lib/seo-utils";
 
 interface FaqItem {
   question: string;
@@ -21,6 +23,7 @@ interface FaqItem {
 
 interface ServiceFormProps {
   initialData?: {
+    id?: string;
     title: string;
     desc: string;
     image: string;
@@ -28,12 +31,17 @@ interface ServiceFormProps {
     mediaType?: "video";
     content?: string;
     faqs?: FaqItem[];
+    focusKeyword?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    slug?: string;
   };
   isEdit?: boolean;
 }
 
 export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [title, setTitle] = useState(initialData?.title || "");
   const [desc, setDesc] = useState(initialData?.desc || "");
   const [image, setImage] = useState(initialData?.image || "");
@@ -42,17 +50,68 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
   );
   const [content, setContent] = useState(initialData?.content || "");
   const [faqs, setFaqs] = useState<FaqItem[]>(initialData?.faqs || []);
-  const [focusKeyword, setFocusKeyword] = useState("");
+  const [focusKeyword, setFocusKeyword] = useState(initialData?.focusKeyword || "");
   const [status, setStatus] = useState<"draft" | "published">(
     isEdit ? "published" : "draft"
   );
   const [seo, setSeo] = useState<SeoData>({
-    metaTitle: initialData?.title || "",
-    metaDescription: initialData?.desc || "",
-    slug: "",
+    metaTitle: initialData?.metaTitle || initialData?.title || "",
+    metaDescription: initialData?.metaDescription || initialData?.desc || "",
+    slug: initialData?.slug || "",
   });
+  const [saving, setSaving] = useState(false);
   const handleSeoChange = (field: keyof SeoData, value: string) =>
     setSeo((prev) => ({ ...prev, [field]: value }));
+
+  // AI verisini form render'dan ÖNCE yükle (SimpleEditor content'i sadece mount'ta okuyor)
+  const [ready, setReady] = useState(!!isEdit);
+  const [imageGenerating, setImageGenerating] = useState(false);
+  const [seoOptimizing, setSeoOptimizing] = useState(false);
+  useEffect(() => {
+    const stored = sessionStorage.getItem("ai-generated-service");
+    if (stored) {
+      sessionStorage.removeItem("ai-generated-service");
+      try {
+        const data = JSON.parse(stored);
+        if (data.title) setTitle(data.title);
+        if (data.excerpt) setDesc(data.excerpt);
+        if (data.image) setImage(data.image);
+        if (data.features?.length) setFeatures(data.features);
+        if (data.content) setContent(data.content);
+        if (data.faqs?.length) setFaqs(data.faqs);
+        if (data.focusKeyword) setFocusKeyword(data.focusKeyword);
+        setSeo({
+          metaTitle: data.metaTitle || data.title || "",
+          metaDescription: data.metaDescription || data.excerpt || "",
+          slug: data.slug || "",
+        });
+        toast("AI içerik başarıyla oluşturuldu!", "success");
+
+        // Görsel yoksa otomatik üret
+        if (!data.image && data.title) {
+          setImageGenerating(true);
+          fetch("/api/ai/image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: data.title, entityType: "service", folder: "services" }),
+          })
+            .then((res) => res.json())
+            .then((imgData) => {
+              if (imgData.url) {
+                setImage(imgData.url);
+                toast("AI kapak görseli oluşturuldu!", "success");
+              } else {
+                toast("AI görsel oluşturulamadı. Manuel olarak ekleyebilirsiniz.", "error");
+              }
+            })
+            .catch(() => toast("AI görsel oluşturulurken hata oluştu.", "error"))
+            .finally(() => setImageGenerating(false));
+        }
+      } catch { /* silent */ }
+    }
+    setReady(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const addFeature = () => setFeatures([...features, ""]);
   const removeFeature = (i: number) =>
@@ -80,20 +139,171 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
     setFaqs(next);
   };
 
-  const handleSaveDraft = () => {
-    setStatus("draft");
-    alert("Taslak olarak kaydedildi!");
+  const saveToDb = async (targetStatus: "draft" | "published") => {
+    if (!title.trim()) { toast("Başlık gerekli.", "error"); return; }
+    if (saving) return;
+    setSaving(true);
+    try {
+      const payload = {
+        title, desc, image, features: features.filter(Boolean), mediaType: undefined as string | undefined,
+        htmlContent: content, faqs, focusKeyword, status: targetStatus,
+        metaTitle: seo.metaTitle, metaDescription: seo.metaDescription, slug: seo.slug,
+      };
+      const isUpdate = isEdit && initialData?.id;
+      const url = isUpdate ? `/api/services/${initialData.id}` : "/api/services";
+      const method = isUpdate ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Bilinmeyen hata" }));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      setStatus(targetStatus);
+      toast(
+        targetStatus === "draft" ? "Taslak olarak kaydedildi."
+          : isEdit ? "Hizmet güncellendi." : "Hizmet oluşturuldu.",
+        "success"
+      );
+      router.push("/admin/hizmetler");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Bilinmeyen hata";
+      toast(`Kaydetme hatası: ${msg}`, "error");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handlePublish = () => {
-    setStatus("published");
-    alert(isEdit ? "Hizmet güncellendi!" : "Hizmet oluşturuldu!");
-    router.push("/admin/hizmetler");
+  const handleSaveDraft = () => saveToDb("draft");
+  const handlePublish = () => saveToDb("published");
+
+  const handleAiSeoOptimize = async () => {
+    if (!focusKeyword.trim()) {
+      toast("Önce bir odak anahtar kelime girin.", "error");
+      return;
+    }
+    if (seoOptimizing) return;
+    setSeoOptimizing(true);
+
+    let currentTitle = title;
+    let currentContent = content;
+    let currentSeo = { ...seo };
+    const MAX_ATTEMPTS = 3;
+
+    try {
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        const analysis = analyzeSeo({
+          focusKeyword,
+          title: currentTitle,
+          content: currentContent,
+          seo: currentSeo,
+          hasMedia: !!image,
+        });
+
+        if (analysis.score >= 100) {
+          toast(`SEO skoru 100! (${attempt > 1 ? `${attempt - 1} deneme ile` : "zaten"} tamamlandı)`, "success");
+          break;
+        }
+
+        const failingChecks = analysis.checks
+          .filter((c) => !c.passed)
+          .map((c) => `${c.label}${c.detail ? ` (${c.detail})` : ""}`);
+
+        toast(`Deneme ${attempt}/${MAX_ATTEMPTS} — Skor: ${analysis.score}, ${failingChecks.length} sorun düzeltiliyor...`, "info");
+
+        const res = await fetch("/api/ai/seo-optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: currentTitle,
+            content: currentContent,
+            focusKeyword,
+            metaTitle: currentSeo.metaTitle,
+            metaDescription: currentSeo.metaDescription,
+            slug: currentSeo.slug,
+            failingChecks,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: "Bilinmeyen hata" }));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        if (data.title) {
+          currentTitle = data.title;
+          setTitle(data.title);
+        }
+        if (data.content) {
+          currentContent = data.content;
+          setContent(data.content);
+        }
+        const newSeo = {
+          metaTitle: data.metaTitle || currentSeo.metaTitle,
+          metaDescription: data.metaDescription || currentSeo.metaDescription,
+          slug: data.slug || currentSeo.slug,
+        };
+        currentSeo = newSeo;
+        setSeo(newSeo);
+
+        const finalAnalysis = analyzeSeo({
+          focusKeyword,
+          title: currentTitle,
+          content: currentContent,
+          seo: currentSeo,
+          hasMedia: !!image,
+        });
+
+        if (finalAnalysis.score >= 100) {
+          toast(`SEO skoru 100'e ulaştı! (${attempt} deneme)`, "success");
+          break;
+        }
+
+        if (attempt === MAX_ATTEMPTS) {
+          toast(`SEO skoru ${finalAnalysis.score}'a yükseltildi. (${MAX_ATTEMPTS} deneme tamamlandı)`, "info");
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Bilinmeyen hata";
+      toast(`SEO iyileştirme hatası: ${msg}`, "error");
+    } finally {
+      setSeoOptimizing(false);
+    }
   };
 
-  const handleAiSeoOptimize = () => {
-    alert("AI SEO iyileştirme yakında aktif olacak!");
+  const handleAiImage = () => {
+    if (!title.trim()) {
+      toast("Önce bir başlık girin.", "error");
+      return;
+    }
+    if (imageGenerating) return;
+    setImageGenerating(true);
+    fetch("/api/ai/image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, entityType: "service", folder: "services" }),
+    })
+      .then((res) => res.json())
+      .then((imgData) => {
+        if (imgData.url) {
+          setImage(imgData.url);
+          toast("AI kapak görseli oluşturuldu!", "success");
+        } else {
+          toast(imgData.error || "Görsel oluşturulamadı.", "error");
+        }
+      })
+      .catch(() => toast("Görsel oluşturulurken hata oluştu.", "error"))
+      .finally(() => setImageGenerating(false));
   };
+
+  if (!ready) return null;
 
   return (
     <EditorLayout
@@ -118,6 +328,7 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
       postTitle={title}
       hasMedia={!!image}
       onAiSeoOptimize={handleAiSeoOptimize}
+      seoOptimizing={seoOptimizing}
       sidebarChildren={
         <>
           {/* Image/Video Upload */}
@@ -128,6 +339,8 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
             folder="services"
             label="Görsel / Video"
             maxSizeMB={50}
+            aiGenerating={imageGenerating}
+            onAiGenerate={handleAiImage}
           />
 
           {/* Description */}
@@ -151,7 +364,7 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl p-5 border border-gray-100"
       >
         <label className="block text-gray-700 text-sm font-medium mb-1.5">
           Hizmet Adı
@@ -171,13 +384,13 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.05 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl p-5 border border-gray-100"
       >
         <label className="block text-gray-700 text-sm font-medium mb-3">
           İçerik
         </label>
         <div className="rounded-xl overflow-hidden border border-gray-200">
-          <SimpleEditor content={initialData?.content} onChange={setContent} />
+          <SimpleEditor content={content} onChange={setContent} />
         </div>
       </motion.div>
 
@@ -186,7 +399,7 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl p-5 border border-gray-100"
       >
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -273,7 +486,7 @@ export default function ServiceForm({ initialData, isEdit }: ServiceFormProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.15 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl p-5 border border-gray-100"
       >
         <div className="flex items-center justify-between mb-4">
           <div>

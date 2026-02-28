@@ -9,6 +9,7 @@ import {
   Image as ImageIcon,
   Film,
   Loader2,
+  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 
@@ -22,6 +23,8 @@ interface CloudinaryUploadProps {
   label?: string;
   maxSizeMB?: number;
   onMediaTypeChange?: (type: "image" | "video") => void;
+  aiGenerating?: boolean;
+  onAiGenerate?: () => void;
 }
 
 const ACCEPT_MAP: Record<AcceptType, string> = {
@@ -38,6 +41,8 @@ export default function CloudinaryUpload({
   label,
   maxSizeMB = 50,
   onMediaTypeChange,
+  aiGenerating,
+  onAiGenerate,
 }: CloudinaryUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -202,7 +207,46 @@ export default function CloudinaryUpload({
       )}
 
       <AnimatePresence mode="wait">
-        {hasValue && !isUploading ? (
+        {aiGenerating && !hasValue ? (
+          <motion.div
+            key="ai-generating"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="relative overflow-hidden rounded-xl border border-violet-300/50 p-6 text-center"
+            style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #f5f3ff 100%)" }}
+          >
+            {/* Animated shimmer */}
+            <div
+              className="absolute inset-0 opacity-40"
+              style={{
+                background: "linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.15) 50%, transparent 100%)",
+                animation: "shimmer 2s infinite",
+              }}
+            />
+            <div className="relative flex flex-col items-center gap-3">
+              <div
+                className="size-12 rounded-xl flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)" }}
+              >
+                <Sparkles className="size-5 text-white animate-pulse" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-violet-700">
+                  AI görsel oluşturuyor...
+                </p>
+                <p className="text-xs text-violet-400 mt-1">
+                  Bu işlem 15-30 saniye sürebilir
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="size-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                <span className="size-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                <span className="size-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+              </div>
+            </div>
+          </motion.div>
+        ) : hasValue && !isUploading ? (
           <motion.div
             key="preview"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -309,6 +353,27 @@ export default function CloudinaryUpload({
                       {accept === "both" && " — Görsel veya Video"}
                     </p>
                   </div>
+                  {onAiGenerate && (
+                    <>
+                      <div className="w-full border-t border-gray-200 my-1" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAiGenerate();
+                        }}
+                        className="group/ai relative inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-xs font-semibold overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-violet-500/25 hover:scale-[1.02] cursor-pointer"
+                        style={{ background: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)" }}
+                      >
+                        <span
+                          className="absolute inset-0 opacity-0 group-hover/ai:opacity-100 transition-opacity duration-300"
+                          style={{ background: "linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%)" }}
+                        />
+                        <Sparkles className="size-3.5 relative z-10" />
+                        <span className="relative z-10">AI ile Görsel Oluştur</span>
+                      </button>
+                    </>
+                  )}
                 </>
               )}
             </div>

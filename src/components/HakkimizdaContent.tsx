@@ -15,12 +15,13 @@ import {
   Heart,
   MessageCircle,
 } from "lucide-react";
+import type { SiteSettings } from "@/lib/settings";
 
 const statsData = [
-  { value: "500+", label: "Tamamlanan Proje", icon: Award },
-  { value: "%98", label: "Müşteri Memnuniyeti", icon: Heart },
-  { value: "10+", label: "Yıllık Deneyim", icon: Clock },
   { value: "A+", label: "Kalite Standartı", icon: Shield },
+  { value: "%100", label: "Müşteri Memnuniyeti", icon: Heart },
+  { value: "7/24", label: "Destek Hattı", icon: Clock },
+  { value: "Kayseri", label: "Hizmet Bölgesi", icon: Award },
 ];
 
 const featuresList = [
@@ -49,11 +50,11 @@ const equipmentCards = [
 ];
 
 const timeline = [
-  { year: "2015", title: "Kuruluş", desc: "Yunus Özkan İnşaat, ilk kepçemizle hizmet vermeye başladı." },
-  { year: "2017", title: "Filo Genişlemesi", desc: "Kamyon filosu ve yeni iş makineleri ile kapasitemizi artırdık." },
-  { year: "2019", title: "Büyük Projeler", desc: "Site ve toplu konut projelerinde istinat duvarı işleri üstlendik." },
-  { year: "2022", title: "Hizmet Çeşitliliği", desc: "Taş ev yapımı, parke döşeme ve drenaj sistemleri hizmetlerimize eklendi." },
-  { year: "2024", title: "500+ Proje", desc: "500'ü aşkın başarıyla tamamlanan projeye ulaştık." },
+  { year: "01", title: "Kuruluş", desc: "Yunus Özkan İnşaat, ilk kepçemizle hizmet vermeye başladı." },
+  { year: "02", title: "Filo Genişlemesi", desc: "Kamyon filosu ve yeni iş makineleri ile kapasitemizi artırdık." },
+  { year: "03", title: "Büyük Projeler", desc: "Site ve toplu konut projelerinde istinat duvarı işleri üstlendik." },
+  { year: "04", title: "Hizmet Çeşitliliği", desc: "Taş ev yapımı, parke döşeme ve drenaj sistemleri hizmetlerimize eklendi." },
+  { year: "05", title: "Sürekli Büyüme", desc: "Modern ekipman parkı ve deneyimli kadromuzla büyümeye devam ediyoruz." },
 ];
 
 const values = [
@@ -74,7 +75,7 @@ const values = [
   },
 ];
 
-export default function HakkimizdaContent() {
+export default function HakkimizdaContent({ settings }: { settings: SiteSettings }) {
   return (
     <>
       {/* Hero Section — Image + Intro */}
@@ -114,7 +115,7 @@ export default function HakkimizdaContent() {
                     yaşanmaz. Zamanlama ve kalite kontrolü tamamen bizim elimizdedir.
                   </p>
                   <p className="text-theme-text-secondary leading-relaxed text-base">
-                    2015 yılından bu yana Türkiye genelinde yüzlerce projeyi başarıyla tamamladık.
+                    Kayseri ve çevresinde birçok projeyi başarıyla tamamladık.
                     Kendi ekipmanlarımızla çalışarak maliyetleri düşürüyor, kaliteyi artırıyoruz.
                   </p>
                 </div>
@@ -149,7 +150,7 @@ export default function HakkimizdaContent() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass hover:bg-white/10 transition-all duration-300 border border-transparent hover:border-primary-gold/30 rounded-2xl p-6 text-center"
+                  className="glass hover:bg-white/10 transition-[border-color,background-color] duration-300 border border-transparent hover:border-primary-gold/30 rounded-2xl p-6 text-center"
                 >
                   <div className="gold-gradient size-12 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <Icon className="text-black size-6" />
@@ -181,7 +182,7 @@ export default function HakkimizdaContent() {
               Yolculuğumuz
             </h2>
             <p className="text-theme-text-secondary leading-relaxed text-base">
-              2015&apos;ten bugüne kadar sürekli büyüyen bir hikaye.
+              Kuruluşumuzdan bugüne sürekli büyüyen bir hikaye.
             </p>
           </motion.div>
 
@@ -247,7 +248,7 @@ export default function HakkimizdaContent() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass hover:bg-white/10 transition-all duration-500 group relative overflow-hidden border border-transparent hover:border-primary-gold/50 rounded-2xl p-7"
+                  className="glass hover:bg-white/10 transition-[border-color,background-color] duration-500 group relative overflow-hidden border border-transparent hover:border-primary-gold/50 rounded-2xl p-7"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-[#d5b36b]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative z-10">
@@ -296,7 +297,7 @@ export default function HakkimizdaContent() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass hover:bg-white/10 transition-all duration-500 group relative overflow-hidden border border-transparent hover:border-primary-gold/50 rounded-2xl p-7"
+                  className="glass hover:bg-white/10 transition-[border-color,background-color] duration-500 group relative overflow-hidden border border-transparent hover:border-primary-gold/50 rounded-2xl p-7"
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-[#d5b36b]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative z-10">
@@ -331,7 +332,7 @@ export default function HakkimizdaContent() {
                 Profesyonel ekibimizle projelerinizi hayata geçiriyoruz.
               </p>
               <a
-                href="https://wa.me/905337711182"
+                href={`https://wa.me/${settings.phoneRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary inline-flex items-center gap-2.5"

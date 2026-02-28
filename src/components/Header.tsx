@@ -20,6 +20,7 @@ import {
   Moon,
 } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import type { SiteSettings } from "@/lib/settings";
 
 const navLinksLeft = [
   { href: "/", label: "Ana Sayfa" },
@@ -47,7 +48,7 @@ function isActiveLink(href: string, pathname: string) {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
-export default function Header() {
+export default function Header({ settings }: { settings: SiteSettings }) {
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -122,7 +123,7 @@ export default function Header() {
                 )}
               </button>
               <a
-                href="https://wa.me/905337711182"
+                href={`https://wa.me/${settings.phoneRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-theme-text hover:text-primary-gold transition-all duration-300 p-1"
@@ -197,7 +198,7 @@ export default function Header() {
                 )}
               </button>
               <a
-                href="https://wa.me/905337711182"
+                href={`https://wa.me/${settings.phoneRaw}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary inline-flex items-center text-sm xl:text-base gap-2"
@@ -283,7 +284,7 @@ export default function Header() {
               <div className="p-4 border-t border-theme-border">
                 {/* CTA Button */}
                 <a
-                  href="https://wa.me/905337711182"
+                  href={`https://wa.me/${settings.phoneRaw}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-primary w-full inline-flex items-center justify-center mb-4 text-sm gap-2"
@@ -296,17 +297,17 @@ export default function Header() {
                 {/* Contact Info */}
                 <div>
                   <a
-                    href="tel:+905337711182"
+                    href={`tel:+${settings.phoneRaw}`}
                     className="inline-flex items-center text-theme-text-secondary hover:text-primary-gold transition-colors duration-300 gap-3"
                   >
                     <Phone className="w-4 h-4 text-primary-gold" />
-                    <span className="text-sm">0533 771 11 82</span>
+                    <span className="text-sm">{settings.phone}</span>
                   </a>
                 </div>
 
                 {/* Copyright */}
                 <p className="text-theme-text-faint text-xs mt-4 text-center">
-                  2015&apos;ten beri güvenilir hizmet
+                  Güvenilir İnşaat Hizmetleri
                 </p>
               </div>
             </motion.aside>

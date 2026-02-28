@@ -25,6 +25,7 @@ interface EditorLayoutProps {
   postTitle: string;
   hasMedia?: boolean;
   onAiSeoOptimize?: () => void;
+  seoOptimizing?: boolean;
 
   // Slots
   children: React.ReactNode;
@@ -50,6 +51,7 @@ export default function EditorLayout({
   postTitle,
   hasMedia,
   onAiSeoOptimize,
+  seoOptimizing,
   children,
   sidebarChildren,
 }: EditorLayoutProps) {
@@ -82,6 +84,7 @@ export default function EditorLayout({
           postTitle={postTitle}
           hasMedia={hasMedia}
           onAiSeoOptimize={onAiSeoOptimize}
+          seoOptimizing={seoOptimizing}
         >
           {sidebarChildren}
         </FormSidebar>

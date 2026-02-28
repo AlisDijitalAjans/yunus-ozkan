@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { CheckCircle, MessageCircle, ChevronDown } from "lucide-react";
+import type { SiteSettings } from "@/lib/settings";
 
 const features = [
   "Profesyonel Ekip ve Kaliteli İşçilik",
@@ -11,12 +12,12 @@ const features = [
 ];
 
 const stats = [
-  { value: "500+", label: "Tamamlanan Proje" },
-  { value: "20+", label: "Uzman Ekip" },
-  { value: "100%", label: "Müşteri Memnuniyeti" },
+  { value: "A+", label: "Kalite Standartı" },
+  { value: "7/24", label: "Destek Hattı" },
+  { value: "%100", label: "Müşteri Memnuniyeti" },
 ];
 
-export default function Hero() {
+export default function Hero({ settings }: { settings: SiteSettings }) {
   return (
     <section
       id="hero"
@@ -73,7 +74,7 @@ export default function Hero() {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                 <a
-                  href="https://wa.me/905337711182"
+                  href={`https://wa.me/${settings.phoneRaw}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-primary flex items-center justify-center text-center gap-2"

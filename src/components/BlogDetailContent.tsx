@@ -19,22 +19,50 @@ import {
   Link2,
   User,
 } from "lucide-react";
-import { BlogPost, blogPosts } from "@/data/blogPosts";
+import type { BlogPost } from "@/data/blogPosts";
+import type { SiteSettings } from "@/lib/settings";
 
 interface BlogDetailContentProps {
   post: BlogPost;
+  relatedPosts?: BlogPost[];
+  settings: SiteSettings;
 }
 
-export default function BlogDetailContent({ post }: BlogDetailContentProps) {
+export default function BlogDetailContent({ post, relatedPosts: relatedPostsProp, settings }: BlogDetailContentProps) {
   const [activeHeadingId, setActiveHeadingId] = useState("");
   const [tocOpen, setTocOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Parse headings from htmlContent or use sections
+  const [htmlHeadings, setHtmlHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
+
+  useEffect(() => {
+    if (post.htmlContent) {
+      // Parse headings from rendered HTML and add IDs
+      const article = document.querySelector("article .prose");
+      if (!article) return;
+      const headings = article.querySelectorAll("h2, h3");
+      const parsed: { id: string; text: string; level: number }[] = [];
+      headings.forEach((el, i) => {
+        const id = el.id || `heading-${i}`;
+        el.id = id;
+        parsed.push({ id, text: el.textContent || "", level: el.tagName === "H2" ? 2 : 3 });
+      });
+      setHtmlHeadings(parsed);
+    }
+  }, [post.htmlContent]);
+
+  const tocItems = post.htmlContent
+    ? htmlHeadings.map((h) => ({ headingId: h.id, headingText: h.text, headingLevel: h.level as 2 | 3 }))
+    : (post.sections || []).map((s) => ({ headingId: s.headingId, headingText: s.headingText, headingLevel: s.headingLevel }));
+
   // IntersectionObserver for active heading tracking
   useEffect(() => {
-    const headingElements = post.sections
+    const headingElements = tocItems
       .map((s) => document.getElementById(s.headingId))
       .filter(Boolean) as HTMLElement[];
+
+    if (headingElements.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -49,7 +77,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
 
     headingElements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [post.sections]);
+  }, [tocItems]);
 
   const scrollToHeading = useCallback((headingId: string) => {
     document.getElementById(headingId)?.scrollIntoView({ behavior: "smooth" });
@@ -65,26 +93,24 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareText = post.title;
 
-  const relatedPosts = blogPosts
-    .filter((p) => p.slug !== post.slug)
-    .slice(0, 3);
+  const relatedPosts = relatedPostsProp ?? [];
 
   // --- TOC Component ---
   const TocContent = () => (
     <nav className="flex flex-col gap-1">
-      {post.sections.map((section) => (
+      {tocItems.map((item) => (
         <button
-          key={section.headingId}
-          onClick={() => scrollToHeading(section.headingId)}
+          key={item.headingId}
+          onClick={() => scrollToHeading(item.headingId)}
           className={`text-left text-sm py-1.5 px-3 rounded-lg transition-all duration-300 ${
-            section.headingLevel === 3 ? "pl-6" : ""
+            item.headingLevel === 3 ? "pl-6" : ""
           } ${
-            activeHeadingId === section.headingId
+            activeHeadingId === item.headingId
               ? "text-primary-gold font-semibold bg-primary-gold/10 border-l-2 border-primary-gold"
               : "text-theme-text-muted hover:text-theme-text hover:bg-theme-glass-bg"
           }`}
         >
-          {section.headingText}
+          {item.headingText}
         </button>
       ))}
     </nav>
@@ -260,7 +286,28 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
 
             {/* --- MAIN CONTENT (center) --- */}
             <article className="min-w-0">
-              {post.sections.map((section, index) => (
+              {/* HTML content from TipTap editor */}
+              {post.htmlContent ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="prose prose-lg max-w-none
+                    prose-headings:text-theme-text prose-headings:font-bold prose-headings:scroll-mt-28
+                    prose-h2:text-fluid-subsection prose-h2:mb-4 prose-h2:mt-10
+                    prose-h3:text-xl prose-h3:mb-3 prose-h3:mt-8
+                    prose-p:text-theme-text-secondary prose-p:leading-relaxed prose-p:mb-4
+                    prose-strong:text-theme-text prose-strong:font-semibold
+                    prose-a:text-primary-gold prose-a:no-underline hover:prose-a:underline
+                    prose-ul:my-5 prose-li:text-theme-text-secondary
+                    prose-blockquote:border-l-4 prose-blockquote:border-primary-gold prose-blockquote:pl-5 prose-blockquote:italic prose-blockquote:text-theme-text-secondary
+                    prose-img:rounded-2xl prose-img:my-6"
+                  dangerouslySetInnerHTML={{ __html: post.htmlContent }}
+                />
+              ) : (
+                /* Sections-based content (legacy/static posts) */
+                post.sections?.map((section, index) => (
                 <motion.div
                   key={section.headingId}
                   initial={{ opacity: 0, y: 20 }}
@@ -340,7 +387,8 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                     </figure>
                   )}
                 </motion.div>
-              ))}
+              ))
+              )}
 
               {/* Back to blog link */}
               <motion.div
@@ -363,6 +411,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
             <aside className="space-y-6 lg:space-y-0">
               <div className="lg:sticky lg:top-28 space-y-6">
                 {/* AI Analysis Card */}
+                {post.aiAnalysis?.summary && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -388,6 +437,8 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                     </p>
 
                     {/* Key Points */}
+                    {post.aiAnalysis.keyPoints?.length > 0 && (
+                    <>
                     <h4 className="text-theme-text font-semibold text-xs uppercase tracking-wider mb-3">
                       Temel Noktalar
                     </h4>
@@ -404,8 +455,12 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                         </li>
                       ))}
                     </ul>
+                    </>
+                    )}
 
                     {/* Related Topics */}
+                    {post.aiAnalysis.relatedTopics?.length > 0 && (
+                    <>
                     <h4 className="text-theme-text font-semibold text-xs uppercase tracking-wider mb-3">
                       İlgili Konular
                     </h4>
@@ -419,8 +474,11 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                         </span>
                       ))}
                     </div>
+                    </>
+                    )}
                   </div>
                 </motion.div>
+                )}
 
                 {/* Contact / CTA Card */}
                 <motion.div
@@ -439,7 +497,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                   </p>
 
                   <a
-                    href="https://wa.me/905551234567?text=Merhaba,%20blog%20yazınızı%20okudum.%20Bilgi%20almak%20istiyorum."
+                    href={`https://wa.me/${settings.phoneRaw}?text=Merhaba,%20blog%20yazınızı%20okudum.%20Bilgi%20almak%20istiyorum.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
@@ -449,11 +507,11 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                   </a>
 
                   <a
-                    href="tel:+905551234567"
+                    href={`tel:+${settings.phoneRaw}`}
                     className="flex items-center justify-center gap-2 mt-3 text-primary-gold font-semibold text-sm hover:underline"
                   >
                     <Phone className="size-4" />
-                    0555 123 45 67
+                    {settings.phone}
                   </a>
                 </motion.div>
               </div>
@@ -485,7 +543,7 @@ export default function BlogDetailContent({ post }: BlogDetailContentProps) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.05 }}
-                  className="glass group overflow-hidden border border-transparent hover:border-primary-gold/50 transition-all duration-500 cursor-pointer rounded-2xl h-full"
+                  className="glass group overflow-hidden border border-transparent hover:border-primary-gold/50 transition-[border-color] duration-500 cursor-pointer rounded-2xl h-full"
                 >
                   <div className="relative overflow-hidden aspect-[16/10]">
                     <Image

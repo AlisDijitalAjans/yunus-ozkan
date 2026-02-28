@@ -1,8 +1,18 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Sparkles,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
 
 interface Column {
   key: string;
@@ -19,9 +29,96 @@ interface DataTableProps {
   newHref: string;
   editHref: (row: Record<string, unknown>) => string;
   onDelete?: (row: Record<string, unknown>) => void;
+  onToggleStatus?: (row: Record<string, unknown>) => void;
   searchKey?: string;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
+  onAiCreate?: () => void;
+  statsSlot?: React.ReactNode;
+}
+
+function RowActions({
+  row,
+  editHref,
+  onDelete,
+  onToggleStatus,
+}: {
+  row: Record<string, unknown>;
+  editHref: string;
+  onDelete?: (row: Record<string, unknown>) => void;
+  onToggleStatus?: (row: Record<string, unknown>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  const isActive = row.status !== "passive";
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+      >
+        <MoreHorizontal className="size-4" />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-xl border border-gray-200 py-1 z-20">
+          {onToggleStatus && (
+            <button
+              onClick={() => {
+                onToggleStatus(row);
+                setOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              {isActive ? (
+                <>
+                  <ToggleRight className="size-4 text-emerald-500" />
+                  Pasife Al
+                </>
+              ) : (
+                <>
+                  <ToggleLeft className="size-4 text-gray-400" />
+                  Aktife Al
+                </>
+              )}
+            </button>
+          )}
+          <Link
+            href={editHref}
+            onClick={() => setOpen(false)}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Pencil className="size-4 text-blue-500" />
+            Düzenle
+          </Link>
+          {onDelete && (
+            <button
+              onClick={() => {
+                onDelete(row);
+                setOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+            >
+              <Trash2 className="size-4" />
+              Sil
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function DataTable({
@@ -32,9 +129,12 @@ export default function DataTable({
   newHref,
   editHref,
   onDelete,
+  onToggleStatus,
   searchKey,
   searchValue,
   onSearchChange,
+  onAiCreate,
+  statsSlot,
 }: DataTableProps) {
   const filtered =
     searchKey && searchValue
@@ -47,19 +147,33 @@ export default function DataTable({
 
   return (
     <div className="space-y-6">
+      {/* Stats */}
+      {statsSlot}
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
           <p className="text-gray-500 text-sm mt-1">{description}</p>
         </div>
-        <Link
-          href={newHref}
-          className="btn-primary inline-flex items-center gap-2 text-sm shrink-0 self-start"
-        >
-          <Plus className="size-4" />
-          Yeni Ekle
-        </Link>
+        <div className="flex items-center gap-2 shrink-0 self-start">
+          {onAiCreate && (
+            <button
+              onClick={onAiCreate}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-medium hover:from-violet-700 hover:to-indigo-700 transition-all cursor-pointer"
+            >
+              <Sparkles className="size-3.5" />
+              AI ile Oluştur
+            </button>
+          )}
+          <Link
+            href={newHref}
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition-colors"
+          >
+            <Plus className="size-3.5" />
+            Yeni Ekle
+          </Link>
+        </div>
       </div>
 
       {/* Search */}
@@ -81,7 +195,7 @@ export default function DataTable({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
-        className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+        className="bg-white rounded-2xl overflow-hidden border border-gray-100"
       >
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -95,8 +209,8 @@ export default function DataTable({
                     {col.label}
                   </th>
                 ))}
-                <th className="text-right text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3">
-                  İşlemler
+                <th className="text-right text-gray-500 text-xs font-medium uppercase tracking-wider px-5 py-3 w-12">
+
                 </th>
               </tr>
             </thead>
@@ -131,22 +245,12 @@ export default function DataTable({
                       </td>
                     ))}
                     <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={editHref(row)}
-                          className="p-1.5 rounded-lg hover:bg-primary-gold/10 text-gray-400 hover:text-primary-gold transition-colors"
-                        >
-                          <Pencil className="size-4" />
-                        </Link>
-                        {onDelete && (
-                          <button
-                            onClick={() => onDelete(row)}
-                            className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
-                        )}
-                      </div>
+                      <RowActions
+                        row={row}
+                        editHref={editHref(row)}
+                        onDelete={onDelete}
+                        onToggleStatus={onToggleStatus}
+                      />
                     </td>
                   </tr>
                 ))

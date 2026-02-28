@@ -21,6 +21,7 @@ interface FormSidebarProps {
   postTitle: string;
   hasMedia?: boolean;
   onAiSeoOptimize?: () => void;
+  seoOptimizing?: boolean;
 }
 
 export default function FormSidebar({
@@ -34,6 +35,7 @@ export default function FormSidebar({
   postTitle,
   hasMedia,
   onAiSeoOptimize,
+  seoOptimizing,
 }: FormSidebarProps) {
   return (
     <div className="space-y-5 sticky top-[7.5rem] lg:top-[4rem] self-start max-h-[calc(100vh-8.5rem)] lg:max-h-[calc(100vh-5rem)] overflow-y-auto sidebar-scroll">
@@ -42,7 +44,7 @@ export default function FormSidebar({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm space-y-4"
+        className="bg-white rounded-2xl p-5 border border-gray-100 space-y-4"
       >
         <h3 className="text-gray-900 font-semibold text-sm">{title}</h3>
         {children}
@@ -57,6 +59,7 @@ export default function FormSidebar({
         seo={seo}
         hasMedia={hasMedia}
         onAiSeoOptimize={onAiSeoOptimize}
+        seoOptimizing={seoOptimizing}
       />
 
       {/* SEO Settings */}
@@ -64,7 +67,7 @@ export default function FormSidebar({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.15 }}
-        className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm space-y-4"
+        className="bg-white rounded-2xl p-5 border border-gray-100 space-y-4"
       >
         <div className="flex items-center gap-2">
           <Search className="size-4 text-primary-gold" />

@@ -129,7 +129,7 @@ export const blogPosts: BlogPost[] = [
         headingLevel: 2,
         content: [
           "İstinat duvarı yapımı, mühendislik bilgisi ve saha deneyimi gerektiren önemli bir iştir. Zemin etüdünden malzeme seçimine, drenajdan sıkıştırmaya kadar her aşama titizlikle yürütülmelidir.",
-          "Profesyonel bir ekiple çalışmak ve projelendirme aşamasında tüm detayları planlamak, hem güvenli hem de uzun ömürlü bir yapı elde etmenin anahtarıdır. Yunus Özkan İnşaat olarak, 10 yılı aşkın deneyimimizle bu alanda güvenilir çözümler sunuyoruz.",
+          "Profesyonel bir ekiple çalışmak ve projelendirme aşamasında tüm detayları planlamak, hem güvenli hem de uzun ömürlü bir yapı elde etmenin anahtarıdır. Yunus Özkan İnşaat olarak, deneyimli ekibimizle bu alanda güvenilir çözümler sunuyoruz.",
         ],
       },
     ],

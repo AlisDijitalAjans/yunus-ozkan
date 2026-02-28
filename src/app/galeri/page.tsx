@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import PageHeader from "@/components/PageHeader";
 import GaleriContent from "@/components/GaleriContent";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "Galeri | Yunus Özkan İnşaat",
   description: "Yunus Özkan İnşaat projelerinden fotoğraf galerisi. İstinat duvarı, hafriyat ve arazi düzenleme çalışmalarımız.",
 };
 
-export default function GaleriPage() {
+export default async function GaleriPage() {
+  const settings = await getSettings();
+
   return (
     <>
       <PageHeader
@@ -16,7 +19,7 @@ export default function GaleriPage() {
         highlight="Kareler"
         description="Tamamladığımız projelerden fotoğraf galerisi."
       />
-      <GaleriContent />
+      <GaleriContent settings={settings} />
     </>
   );
 }
